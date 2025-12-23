@@ -1,4 +1,4 @@
-import { store, media } from '@telemetryos/sdk'
+import { store, media, send } from '@telemetryos/sdk'
 import { useUiScaleToSetRem } from '@telemetryos/sdk/react'
 import { useEffect, useState } from 'react'
 import {
@@ -44,6 +44,7 @@ export function Render() {
 
   useEffect(() => {
     console.log('Render View Mounted', { hasInstance: !!instance, isLoadingTarget })
+    send('ready', {})
   }, [instance, isLoadingTarget])
 
   // Countdown Logic
