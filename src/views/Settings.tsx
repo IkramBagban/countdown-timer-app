@@ -14,7 +14,7 @@ import {
   SettingsBox,
   SettingsDivider,
 } from '@telemetryos/sdk/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   useTargetDateStoreState,
   useTimezoneStoreState,
@@ -53,6 +53,7 @@ if (!TIMEZONES.includes(localTz)) {
 export function Settings() {
   const instance = store().instance
 
+  // Explicitly passing instance is critical for syncing in QA/Studio environments
   const [isLoadingTarget, targetDate, setTargetDate] = useTargetDateStoreState(instance)
   const [isLoadingTz, timezone, setTimezone] = useTimezoneStoreState(instance)
   const [isLoadingStyle, displayStyle, setDisplayStyle] = useDisplayStyleStoreState(instance)
@@ -66,8 +67,13 @@ export function Settings() {
   const [isLoadingThemeSec, themeSecondary, setThemeSecondary] = useThemeSecondaryStoreState(instance)
   const [isLoadingBg, background, setBackground] = useBackgroundStoreState(instance)
 
-  // Use a softer loading check: only if we don't even have an instance ID yet
-  const isSyncing = !instance && isLoadingTarget
+  // Robust loading check with safety timeout
+  const [isSyncing, setIsSyncing] = useState(true)
+  useEffect(() => {
+    if (!isLoadingTarget) setIsSyncing(false)
+    const timer = setTimeout(() => setIsSyncing(false), 5000) // 5s safety cap
+    return () => clearTimeout(timer)
+  }, [isLoadingTarget])
 
   const handleUnitToggle = (unit: keyof typeof visibleUnits) => {
     setVisibleUnits({
@@ -76,16 +82,33 @@ export function Settings() {
     })
   }
 
+  useEffect(() => {
+    console.log('Settings View Mounted', { hasInstance: !!instance, isLoadingTarget })
+  }, [instance, isLoadingTarget])
+
   return (
     <SettingsContainer>
+      {/* Diagnostic Status Bar */}
+      <div style={{
+        padding: '0.75rem',
+        marginBottom: '1rem',
+        borderRadius: '0.4rem',
+        fontSize: '1rem',
+        backgroundColor: instance ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+        border: `1px solid ${instance ? '#4CAF50' : '#F44336'}`,
+        color: instance ? '#4CAF50' : '#444',
+      }}>
+        {instance ? 'Linked to Studio Instance' : 'Waiting for Platform SDK Handshake (Check your App Slug)...'}
+      </div>
+
       <SettingsField>
         <SettingsLabel>Target Date & Time</SettingsLabel>
         <SettingsInputFrame>
           <input
             type="datetime-local"
-            disabled={isSyncing}
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
+            disabled={isSyncing}
             style={{ width: '100%', boxSizing: 'border-box' }}
           />
         </SettingsInputFrame>
@@ -95,9 +118,9 @@ export function Settings() {
         <SettingsLabel>Timezone</SettingsLabel>
         <SettingsSelectFrame>
           <select
-            disabled={isSyncing}
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
+            disabled={isSyncing}
           >
             {TIMEZONES.map((tz) => (
               <option key={tz} value={tz}>
@@ -114,9 +137,9 @@ export function Settings() {
         <SettingsLabel>Display Style</SettingsLabel>
         <SettingsSelectFrame>
           <select
-            disabled={isSyncing}
             value={displayStyle}
             onChange={(e) => setDisplayStyle(e.target.value as any)}
+            disabled={isSyncing}
           >
             <option value="card">Cards</option>
             <option value="circle">Circular Progress</option>
@@ -233,16 +256,7 @@ export function Settings() {
       ) : (
         <SettingsField>
           <SettingsLabel>Media</SettingsLabel>
-          {/* <SettingsInputFrame>
-            <input
-              type="text"
-              placeholder="Enter Media ID"
-              disabled={isSyncing}
-            // value={completionMediaId}
-            // onChange={(e) => setCompletionMediaId(e.target.value)}
-            />
-          </SettingsInputFrame> */}
-          <div style={{ fontSize: '1.3rem', opacity: 0.7, marginTop: '.2rem' }}>
+          <div style={{ fontSize: '1.2rem', opacity: 0.7, padding: '0.5rem 0' }}>
             Media picker will be implemented in Stage 2.
           </div>
         </SettingsField>
@@ -254,13 +268,13 @@ export function Settings() {
         <SettingsLabel>Theme Colors</SettingsLabel>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <div style={{ flex: 1 }}>
-            <SettingsLabel>Primary (Text)</SettingsLabel>
+            <SettingsLabel>Primary (Text/Cards)</SettingsLabel>
             <SettingsInputFrame>
               <input
                 type="color"
                 value={themePrimary}
                 onChange={(e) => setThemePrimary(e.target.value)}
-                style={{ width: '100%', height: '4rem', padding: 0, border: 'none' }}
+                style={{ width: '100%', height: '3rem', padding: 0 }}
                 disabled={isSyncing}
               />
             </SettingsInputFrame>
@@ -272,7 +286,7 @@ export function Settings() {
                 type="color"
                 value={themeSecondary}
                 onChange={(e) => setThemeSecondary(e.target.value)}
-                style={{ width: '100%', height: '4rem', padding: 0, border: 'none' }}
+                style={{ width: '100%', height: '3rem', padding: 0 }}
                 disabled={isSyncing}
               />
             </SettingsInputFrame>
@@ -305,7 +319,7 @@ export function Settings() {
               type="color"
               value={background.color}
               onChange={(e) => setBackground({ ...background, color: e.target.value })}
-              style={{ width: '100%', height: '4rem', padding: 0, border: 'none' }}
+              style={{ width: '100%', height: '3rem', padding: 0 }}
               disabled={isSyncing}
             />
           </SettingsInputFrame>
@@ -321,7 +335,7 @@ export function Settings() {
             max="100"
             value={background.opacity}
             onChange={(e) => setBackground({ ...background, opacity: Number(e.target.value) })}
-            disabled={isLoadingTarget}
+            disabled={isSyncing}
           />
         </SettingsSliderFrame>
       </SettingsField>

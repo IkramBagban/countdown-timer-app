@@ -1,5 +1,6 @@
 import { store, media } from '@telemetryos/sdk'
 import { useUiScaleToSetRem } from '@telemetryos/sdk/react'
+import { useEffect, useState } from 'react'
 import {
   useTargetDateStoreState,
   useTimezoneStoreState,
@@ -40,6 +41,10 @@ export function Render() {
   const [isLoadingThemePri, themePrimary] = useThemePrimaryStoreState(instance)
   const [isLoadingThemeSec, themeSecondary] = useThemeSecondaryStoreState(instance)
   const [isLoadingBg, background] = useBackgroundStoreState(instance)
+
+  useEffect(() => {
+    console.log('Render View Mounted', { hasInstance: !!instance, isLoadingTarget })
+  }, [instance, isLoadingTarget])
 
   // Countdown Logic
   const { timeLeft, isCompleted } = useCountdown(targetDate, timezone)
