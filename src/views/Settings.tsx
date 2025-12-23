@@ -19,6 +19,7 @@ import {
   useTimezoneStoreState,
   useDisplayStyleStoreState,
   useVisibleUnitsStoreState,
+  useUnitLabelsStoreState,
   useTitleStoreState,
   useCtaStoreState,
   useCompletionTypeStoreState,
@@ -55,6 +56,7 @@ export function Settings() {
   const [isLoadingTz, timezone, setTimezone] = useTimezoneStoreState(instance)
   const [isLoadingStyle, displayStyle, setDisplayStyle] = useDisplayStyleStoreState(instance)
   const [isLoadingUnits, visibleUnits, setVisibleUnits] = useVisibleUnitsStoreState(instance)
+  const [isLoadingLabels, unitLabels, setUnitLabels] = useUnitLabelsStoreState(instance)
   const [isLoadingTitle, title, setTitle] = useTitleStoreState(instance)
   const [isLoadingCta, cta, setCta] = useCtaStoreState(instance)
   const [isLoadingCompType, completionType, setCompletionType] = useCompletionTypeStoreState(instance)
@@ -114,53 +116,47 @@ export function Settings() {
             value={displayStyle}
             onChange={(e) => setDisplayStyle(e.target.value as any)}
           >
+            <option value="card">Cards</option>
+            <option value="circle">Circular Progress</option>
             <option value="digital">Digital LED</option>
             <option value="flip">Flip Clock</option>
-            <option value="circle">Circular Progress</option>
-            <option value="card">Cards</option>
           </select>
         </SettingsSelectFrame>
       </SettingsField>
 
       <SettingsField>
-        <SettingsLabel>Visible Units</SettingsLabel>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-          <SettingsCheckboxFrame>
-            <input
-              type="checkbox"
-              checked={visibleUnits.days}
-              onChange={() => handleUnitToggle('days')}
-              disabled={isLoading}
-            />
-            <SettingsCheckboxLabel>Days</SettingsCheckboxLabel>
-          </SettingsCheckboxFrame>
-          <SettingsCheckboxFrame>
-            <input
-              type="checkbox"
-              checked={visibleUnits.hours}
-              onChange={() => handleUnitToggle('hours')}
-              disabled={isLoading}
-            />
-            <SettingsCheckboxLabel>Hours</SettingsCheckboxLabel>
-          </SettingsCheckboxFrame>
-          <SettingsCheckboxFrame>
-            <input
-              type="checkbox"
-              checked={visibleUnits.minutes}
-              onChange={() => handleUnitToggle('minutes')}
-              disabled={isLoading}
-            />
-            <SettingsCheckboxLabel>Minutes</SettingsCheckboxLabel>
-          </SettingsCheckboxFrame>
-          <SettingsCheckboxFrame>
-            <input
-              type="checkbox"
-              checked={visibleUnits.seconds}
-              onChange={() => handleUnitToggle('seconds')}
-              disabled={isLoading}
-            />
-            <SettingsCheckboxLabel>Seconds</SettingsCheckboxLabel>
-          </SettingsCheckboxFrame>
+        <SettingsLabel>Visible Units & Labels</SettingsLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {[
+            { id: 'days', label: 'Days' },
+            { id: 'hours', label: 'Hours' },
+            { id: 'minutes', label: 'Minutes' },
+            { id: 'seconds', label: 'Seconds' },
+          ].map((unit) => (
+            <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ flex: '0 0 auto' }}>
+                <SettingsCheckboxFrame>
+                  <input
+                    type="checkbox"
+                    checked={visibleUnits[unit.id as keyof typeof visibleUnits]}
+                    onChange={() => handleUnitToggle(unit.id as keyof typeof visibleUnits)}
+                    disabled={isLoading}
+                  />
+                </SettingsCheckboxFrame>
+              </div>
+              <div style={{ flex: 1 }}>
+                <SettingsInputFrame>
+                  <input
+                    type="text"
+                    value={unitLabels[unit.id as keyof typeof unitLabels]}
+                    onChange={(e) => setUnitLabels({ ...unitLabels, [unit.id]: e.target.value })}
+                    placeholder={unit.label}
+                    disabled={isLoading || !visibleUnits[unit.id as keyof typeof visibleUnits]}
+                  />
+                </SettingsInputFrame>
+              </div>
+            </div>
+          ))}
         </div>
       </SettingsField>
 
@@ -234,8 +230,8 @@ export function Settings() {
         </SettingsField>
       ) : (
         <SettingsField>
-          <SettingsLabel>Media ID (Placeholder)</SettingsLabel>
-          <SettingsInputFrame>
+          <SettingsLabel>Media</SettingsLabel>
+          {/* <SettingsInputFrame>
             <input
               type="text"
               placeholder="Enter Media ID"
@@ -243,8 +239,8 @@ export function Settings() {
             // value={completionMediaId}
             // onChange={(e) => setCompletionMediaId(e.target.value)}
             />
-          </SettingsInputFrame>
-          <div style={{ fontSize: '0.8rem', opacity: 0.7, marginTop: '0.25rem' }}>
+          </SettingsInputFrame> */}
+          <div style={{ fontSize: '1.3rem', opacity: 0.7, marginTop: '.2rem' }}>
             Media picker will be implemented in Stage 2.
           </div>
         </SettingsField>
@@ -262,7 +258,7 @@ export function Settings() {
                 type="color"
                 value={themePrimary}
                 onChange={(e) => setThemePrimary(e.target.value)}
-                style={{ width: '100%', height: '40px', padding: 0, border: 'none' }}
+                style={{ width: '100%', height: '4rem', padding: 0, border: 'none' }}
                 disabled={isLoading}
               />
             </SettingsInputFrame>
@@ -274,7 +270,7 @@ export function Settings() {
                 type="color"
                 value={themeSecondary}
                 onChange={(e) => setThemeSecondary(e.target.value)}
-                style={{ width: '100%', height: '40px', padding: 0, border: 'none' }}
+                style={{ width: '100%', height: '4rem', padding: 0, border: 'none' }}
                 disabled={isLoading}
               />
             </SettingsInputFrame>
@@ -307,7 +303,7 @@ export function Settings() {
               type="color"
               value={background.color}
               onChange={(e) => setBackground({ ...background, color: e.target.value })}
-              style={{ width: '100%', height: '40px', padding: 0, border: 'none' }}
+              style={{ width: '100%', height: '4rem', padding: 0, border: 'none' }}
               disabled={isLoading}
             />
           </SettingsInputFrame>

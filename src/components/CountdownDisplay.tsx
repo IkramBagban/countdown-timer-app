@@ -14,11 +14,17 @@ interface CountdownDisplayProps {
         minutes: boolean
         seconds: boolean
     }
+    unitLabels: {
+        days: string
+        hours: string
+        minutes: string
+        seconds: string
+    }
     // Theme color for circles/svgs
     primaryColor: string
 }
 
-export function CountdownDisplay({ timeLeft, style, visibleUnits, primaryColor }: CountdownDisplayProps) {
+export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, primaryColor }: CountdownDisplayProps) {
 
     // Stage 1 Limit: Disable Digital and Flip
     if (style === 'digital' || style === 'flip') {
@@ -26,9 +32,9 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, primaryColor }
             <div className="stage-placeholder" style={{
                 fontSize: '1.5rem',
                 opacity: 0.7,
-                border: '1px dashed currentColor',
+                border: '0.0625rem dashed currentColor',
                 padding: '2rem',
-                borderRadius: '8px'
+                borderRadius: '0.5rem'
             }}>
                 Visual Style Coming in Stage 2
             </div>
@@ -149,7 +155,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, primaryColor }
                             strokeDasharray={2 * Math.PI * 40}
                             strokeDashoffset={(2 * Math.PI * 40) - ((value / max) * (2 * Math.PI * 40))}
                         />
-                    </svg>      
+                    </svg>
                 )}
             </div>
         )
@@ -157,10 +163,10 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, primaryColor }
 
     return (
         <div className={`countdown-container style-${style}`}>
-            {showD && renderItem(displayValues.days, 'Days', 365)}
-            {showH && renderItem(displayValues.hours, 'Hours', 24)}
-            {showM && renderItem(displayValues.minutes, 'Minutes', 60)}
-            {showS && renderItem(displayValues.seconds, 'Seconds', 60)}
+            {showD && renderItem(displayValues.days, unitLabels.days, 365)}
+            {showH && renderItem(displayValues.hours, unitLabels.hours, 24)}
+            {showM && renderItem(displayValues.minutes, unitLabels.minutes, 60)}
+            {showS && renderItem(displayValues.seconds, unitLabels.seconds, 60)}
         </div>
     )
 }

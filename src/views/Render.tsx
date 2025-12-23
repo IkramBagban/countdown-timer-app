@@ -5,10 +5,12 @@ import {
   useTimezoneStoreState,
   useDisplayStyleStoreState,
   useVisibleUnitsStoreState,
+  useUnitLabelsStoreState,
   useTitleStoreState,
   useCtaStoreState,
   useCompletionTypeStoreState,
   useCompletionTextStoreState,
+  useCompletionMediaIdStoreState,
   useThemePrimaryStoreState,
   useThemeSecondaryStoreState,
   useBackgroundStoreState,
@@ -29,10 +31,12 @@ export function Render() {
   const [isLoadingTz, timezone] = useTimezoneStoreState(instance)
   const [isLoadingStyle, displayStyle] = useDisplayStyleStoreState(instance)
   const [isLoadingUnits, visibleUnits] = useVisibleUnitsStoreState(instance)
+  const [isLoadingLabels, unitLabels] = useUnitLabelsStoreState(instance)
   const [isLoadingTitle, title] = useTitleStoreState(instance)
   const [isLoadingCta, cta] = useCtaStoreState(instance)
   const [isLoadingCompType, completionType] = useCompletionTypeStoreState(instance)
   const [isLoadingCompText, completionText] = useCompletionTextStoreState(instance)
+  const [isLoadingCompMedia, completionMediaId] = useCompletionMediaIdStoreState(instance)
   const [isLoadingThemePri, themePrimary] = useThemePrimaryStoreState(instance)
   const [isLoadingThemeSec, themeSecondary] = useThemeSecondaryStoreState(instance)
   const [isLoadingBg, background] = useBackgroundStoreState(instance)
@@ -46,10 +50,23 @@ export function Render() {
     return <div className="render">Loading...</div>
   }
 
+  // Unconfigured State check (PRD Requirement #10)
+  if (!targetDate) {
+    return (
+      <div className="render">
+        <div className="render__content">
+          <div style={{ fontSize: '2rem', opacity: 0.6 }}>
+            Please set a target date in settings.
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Define CSS Variables for Theming
   const styleVars = {
     '--color-primary': themePrimary || '#ffffff',
-    '--color-text': themeSecondary || '#000000', // Used for contrast or accents
+    '--color-secondary': themeSecondary || '#F8B334',
     '--bg-color': background.type === 'solid' ? background.color : 'transparent',
     '--bg-opacity': background.opacity / 100,
   } as CSSProperties
@@ -74,8 +91,8 @@ export function Render() {
       {renderBackground()}
 
       <div className="render__content">
-        {/* Header: Title */}
-        {title && <h1 className="render__title">{title}</h1>}
+        {/* Header: Title (Hide on completion) */}
+        {!isCompleted && title && <h1 className="render__title">{title}</h1>}
 
         {/* Main: Timer or Completion */}
         {!isCompleted ? (
@@ -83,25 +100,27 @@ export function Render() {
             timeLeft={timeLeft}
             style={displayStyle}
             visibleUnits={visibleUnits}
+            unitLabels={unitLabels}
             primaryColor={themePrimary}
           />
         ) : (
-          <div className="render__completion-container">
+          /* Completion State: Replacement content */
+          <>
             {completionType === 'text' ? (
-              <div className="render__completion">{completionText || 'Time is up!'}</div>
+              completionText && <div className="render__completion">{completionText}</div>
             ) : (
-              // Media Placeholder
-              <div className="render__media-placeholder">
-                {/* Img tag for now if we had a URL, but we only have ID. */}
-                {/* Future: <MediaComponent id={completionMediaId} /> */}
-                <span style={{ fontSize: '2rem' }}>Media Display (Stage 2)</span>
-              </div>
+              /* Media Placeholder (Stage 2) - Only if configured */
+              completionMediaId && (
+                <div className="render__media-placeholder">
+                  <span style={{ fontSize: '2rem' }}>Media Display (Stage 2)</span>
+                </div>
+              )
             )}
-          </div>
+          </>
         )}
 
-        {/* Footer: CTA */}
-        {cta && <div className="render__cta">{cta}</div>}
+        {/* Footer: CTA (Hide on completion) */}
+        {!isCompleted && cta && <div className="render__cta">{cta}</div>}
       </div>
     </div>
   )
