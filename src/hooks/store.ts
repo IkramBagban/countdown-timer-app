@@ -1,4 +1,4 @@
-import { createUseStoreState } from '@telemetryos/sdk/react'
+import { createUseInstanceStoreState } from '@telemetryos/sdk/react'
 
 export type CompletionType = 'text' | 'media'
 export type DisplayStyle = 'digital' | 'flip' | 'circle' | 'card'
@@ -25,18 +25,18 @@ export interface BackgroundConfig {
 }
 
 // Target Time
-export const useTargetDateStoreState = createUseStoreState<string>('targetDate', '')
-export const useTimezoneStoreState = createUseStoreState<string>('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
+export const useTargetDateStoreState = createUseInstanceStoreState<string>('targetDate', '')
+export const useTimezoneStoreState = createUseInstanceStoreState<string>('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
 
 // Appearance
-export const useDisplayStyleStoreState = createUseStoreState<DisplayStyle>('displayStyle', 'card')
-export const useVisibleUnitsStoreState = createUseStoreState<VisibleUnits>('visibleUnits', {
+export const useDisplayStyleStoreState = createUseInstanceStoreState<DisplayStyle>('displayStyle', 'card')
+export const useVisibleUnitsStoreState = createUseInstanceStoreState<VisibleUnits>('visibleUnits', {
     days: true,
     hours: true,
     minutes: true,
     seconds: true,
 })
-export const useUnitLabelsStoreState = createUseStoreState<UnitLabels>('unitLabels', {
+export const useUnitLabelsStoreState = createUseInstanceStoreState<UnitLabels>('unitLabels', {
     days: 'Days',
     hours: 'Hours',
     minutes: 'Minutes',
@@ -44,20 +44,20 @@ export const useUnitLabelsStoreState = createUseStoreState<UnitLabels>('unitLabe
 })
 
 // Messaging
-export const useTitleStoreState = createUseStoreState<string>('title', 'Countdown to Event')
-export const useCtaStoreState = createUseStoreState<string>('cta', '')
+export const useTitleStoreState = createUseInstanceStoreState<string>('title', 'Countdown to Event')
+export const useCtaStoreState = createUseInstanceStoreState<string>('cta', '')
 
 // Completion
-export const useCompletionTypeStoreState = createUseStoreState<CompletionType>('completionType', 'text')
-export const useCompletionTextStoreState = createUseStoreState<string>('completionText', '')
-export const useCompletionMediaIdStoreState = createUseStoreState<string>('completionMediaId', '')
+export const useCompletionTypeStoreState = createUseInstanceStoreState<CompletionType>('completionType', 'text')
+export const useCompletionTextStoreState = createUseInstanceStoreState<string>('completionText', '')
+export const useCompletionMediaIdStoreState = createUseInstanceStoreState<string>('completionMediaId', '')
 
 // Theme
-export const useThemePrimaryStoreState = createUseStoreState<string>('themePrimary', '#FFFFFF')
-export const useThemeSecondaryStoreState = createUseStoreState<string>('themeSecondary', '#F8B334')
+export const useThemePrimaryStoreState = createUseInstanceStoreState<string>('themePrimary', '#FFFFFF')
+export const useThemeSecondaryStoreState = createUseInstanceStoreState<string>('themeSecondary', '#F8B334')
 
 // Background
-export const useBackgroundStoreState = createUseStoreState<BackgroundConfig>('background', {
+export const useBackgroundStoreState = createUseInstanceStoreState<BackgroundConfig>('background', {
     type: 'default',
     color: '#000000',
     mediaId: '',

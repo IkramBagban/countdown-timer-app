@@ -51,21 +51,21 @@ if (!TIMEZONES.includes(localTz)) {
 }
 
 export function Settings() {
-  const instance = store().instance
+  const instance = { id: (store() as any)._applicationInstance || 'loading...' }
 
-  // Explicitly passing instance is critical for syncing in QA/Studio environments
-  const [isLoadingTarget, targetDate, setTargetDate] = useTargetDateStoreState(instance)
-  const [isLoadingTz, timezone, setTimezone] = useTimezoneStoreState(instance)
-  const [isLoadingStyle, displayStyle, setDisplayStyle] = useDisplayStyleStoreState(instance)
-  const [isLoadingUnits, visibleUnits, setVisibleUnits] = useVisibleUnitsStoreState(instance)
-  const [isLoadingLabels, unitLabels, setUnitLabels] = useUnitLabelsStoreState(instance)
-  const [isLoadingTitle, title, setTitle] = useTitleStoreState(instance)
-  const [isLoadingCta, cta, setCta] = useCtaStoreState(instance)
-  const [isLoadingCompType, completionType, setCompletionType] = useCompletionTypeStoreState(instance)
-  const [isLoadingCompText, completionText, setCompletionText] = useCompletionTextStoreState(instance)
-  const [isLoadingThemePri, themePrimary, setThemePrimary] = useThemePrimaryStoreState(instance)
-  const [isLoadingThemeSec, themeSecondary, setThemeSecondary] = useThemeSecondaryStoreState(instance)
-  const [isLoadingBg, background, setBackground] = useBackgroundStoreState(instance)
+  // Instance scoping is now handled automatically by use...InstanceStoreState hooks
+  const [isLoadingTarget, targetDate, setTargetDate] = useTargetDateStoreState()
+  const [isLoadingTz, timezone, setTimezone] = useTimezoneStoreState()
+  const [isLoadingStyle, displayStyle, setDisplayStyle] = useDisplayStyleStoreState()
+  const [isLoadingUnits, visibleUnits, setVisibleUnits] = useVisibleUnitsStoreState()
+  const [isLoadingLabels, unitLabels, setUnitLabels] = useUnitLabelsStoreState()
+  const [isLoadingTitle, title, setTitle] = useTitleStoreState()
+  const [isLoadingCta, cta, setCta] = useCtaStoreState()
+  const [isLoadingCompType, completionType, setCompletionType] = useCompletionTypeStoreState()
+  const [isLoadingCompText, completionText, setCompletionText] = useCompletionTextStoreState()
+  const [isLoadingThemePri, themePrimary, setThemePrimary] = useThemePrimaryStoreState()
+  const [isLoadingThemeSec, themeSecondary, setThemeSecondary] = useThemeSecondaryStoreState()
+  const [isLoadingBg, background, setBackground] = useBackgroundStoreState()
 
   // Robust loading check with safety timeout
   const [isSyncing, setIsSyncing] = useState(true)

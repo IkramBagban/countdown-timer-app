@@ -25,22 +25,22 @@ export function Render() {
   // Responsive Scaling
   useUiScaleToSetRem(1)
 
-  const instance = store().instance
+  // Instance scoping is now handled automatically by hooks
+  const [isLoadingTarget, targetDate] = useTargetDateStoreState()
+  const [isLoadingTz, timezone] = useTimezoneStoreState()
+  const [isLoadingStyle, displayStyle] = useDisplayStyleStoreState()
+  const [isLoadingUnits, visibleUnits] = useVisibleUnitsStoreState()
+  const [isLoadingLabels, unitLabels] = useUnitLabelsStoreState()
+  const [isLoadingTitle, title] = useTitleStoreState()
+  const [isLoadingCta, cta] = useCtaStoreState()
+  const [isLoadingCompType, completionType] = useCompletionTypeStoreState()
+  const [isLoadingCompText, completionText] = useCompletionTextStoreState()
+  const [isLoadingCompMedia, completionMediaId] = useCompletionMediaIdStoreState()
+  const [isLoadingThemePri, themePrimary] = useThemePrimaryStoreState()
+  const [isLoadingThemeSec, themeSecondary] = useThemeSecondaryStoreState()
+  const [isLoadingBg, background] = useBackgroundStoreState()
 
-  // Store Hooks
-  const [isLoadingTarget, targetDate] = useTargetDateStoreState(instance)
-  const [isLoadingTz, timezone] = useTimezoneStoreState(instance)
-  const [isLoadingStyle, displayStyle] = useDisplayStyleStoreState(instance)
-  const [isLoadingUnits, visibleUnits] = useVisibleUnitsStoreState(instance)
-  const [isLoadingLabels, unitLabels] = useUnitLabelsStoreState(instance)
-  const [isLoadingTitle, title] = useTitleStoreState(instance)
-  const [isLoadingCta, cta] = useCtaStoreState(instance)
-  const [isLoadingCompType, completionType] = useCompletionTypeStoreState(instance)
-  const [isLoadingCompText, completionText] = useCompletionTextStoreState(instance)
-  const [isLoadingCompMedia, completionMediaId] = useCompletionMediaIdStoreState(instance)
-  const [isLoadingThemePri, themePrimary] = useThemePrimaryStoreState(instance)
-  const [isLoadingThemeSec, themeSecondary] = useThemeSecondaryStoreState(instance)
-  const [isLoadingBg, background] = useBackgroundStoreState(instance)
+  const instance = { id: (store() as any)._applicationInstance || 'loading...' }
 
   useEffect(() => {
     console.log('Render View Mounted', { hasInstance: !!instance, isLoadingTarget })
