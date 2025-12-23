@@ -27,7 +27,8 @@ interface CountdownDisplayProps {
 export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, primaryColor }: CountdownDisplayProps) {
 
     // Stage 1 Limit: Disable Digital and Flip
-    if (style === 'digital' || style === 'flip') {
+    if (style === 'digital' || style === 'flip' || style === 'circle') {
+        let styleText = style === 'digital' ? 'Digital LED' : style === 'flip' ? 'Flip Clock' : 'Circular Progress'
         return (
             <div className="stage-placeholder" style={{
                 fontSize: '1.5rem',
@@ -36,7 +37,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
                 padding: '2rem',
                 borderRadius: '0.5rem'
             }}>
-                Visual Style Coming in Stage 2
+                {styleText} Style Coming in Stage 2
             </div>
         )
     }
@@ -146,7 +147,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
             <div className={`countdown-item`}>
                 <div className="countdown-value">{pad(value)}   </div>
                 <div className="countdown-label">{label}</div>
-                {style === 'circle' && (
+                {/* {style === 'circle' && (
                     <svg viewBox="0 0 100 100" className="countdown-circle-svg">
                         <circle className="bg-circle" cx="50" cy="50" r="40" />
                         <circle
@@ -156,7 +157,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
                             strokeDashoffset={(2 * Math.PI * 40) - ((value / max) * (2 * Math.PI * 40))}
                         />
                     </svg>
-                )}
+                )} */}
             </div>
         )
     }
