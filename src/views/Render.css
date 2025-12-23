@@ -1,67 +1,320 @@
+/* Render View Styles */
+
+/* Base Layout - Fill Screen, Flex Column, Centered */
 .render {
-  flex: 1;
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  padding: 5vmin;
-  color: hsl(210 40% 88%);
-  background: hsl(212 28% 10%);
+  position: relative;
   overflow: hidden;
+  color: var(--color-primary);
+  /* Uses local updated var */
+  font-family: var(--font-family-base);
 }
 
-.render__logo {
-  width: 30rem;
-  max-width: 50%;
+/* Background Layer */
+.render__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
 }
 
-.render__hero {
+/* Content Layer - Above Background */
+.render__content {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-}
-
-.render__hero-title {
-  font-size: 5rem;
-  font-weight: 600;
+  justify-content: center;
+  width: 100%;
+  max-width: 90vw;
+  /* Safe zone */
   text-align: center;
+  /* Increased spacing as requested */
+  gap: clamp(2rem, 5vh, 4rem);
 }
 
-.render__hero-subtitle {
-  font-size: 3rem;
-  text-align: center;
+/* Title */
+.render__title {
+  font-size: clamp(3rem, 5vw, 6rem);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin: 0;
 }
 
-.render__docs-information {
+/* Call to Action */
+.render__cta {
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--space-4);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Completion Message */
+.render__completion {
+  font-size: clamp(4rem, 8vw, 10rem);
+  font-weight: var(--font-weight-bold);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Media Completion */
+.render__media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =========================================
+   Countdown Display Styles
+   ========================================= */
+
+.countdown-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+  width: 100%;
+}
+
+.countdown-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
 }
 
-.render__docs-information-title {
-  font-size: 2rem;
-  font-weight: 600;
-  text-align: center;
+.countdown-value {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
-.render__docs-information-text {
-  font-size: 2rem;
-  max-width: 60rem;
-  text-align: center;
-}
-
-.render__docs-information-button {
-  display: flex;
-  align-items: center;
-  background: rgb(248, 180, 53);
+.countdown-label {
+  font-size: clamp(0.75rem, 1.5vw, 1.5rem);
   text-transform: uppercase;
-  font-size: 2rem;
-  text-decoration: none;
-  color: black;
-  font-weight: bold;
-  padding: 1rem 2rem;
+  letter-spacing: 0.1em;
+  margin-top: var(--space-2);
+  opacity: 0.8;
+}
+
+/* --- Style: Digital (LED) --- */
+.style-digital .countdown-value {
+  font-family: var(--font-family-mono);
+  font-size: clamp(4rem, 10vw, 12rem);
+  font-weight: 700;
+  /* Glow effect */
+  text-shadow: 0 0 20px currentColor;
+}
+
+/* --- Style: Flip (Card-like) --- */
+.style-flip .countdown-item {
+  background: rgba(0, 0, 0, 0.2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.style-flip .countdown-value {
+  font-size: clamp(3rem, 8vw, 10rem);
+  font-weight: 800;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+/* --- Style: Circle (Progress) --- */
+.style-circle {
+  gap: clamp(1rem, 2vw, 3rem);
+  /* Slightly tighter gap for grid */
+  width: 100%;
+  max-width: 100%;
+
+  /* GRID REFACTOR: Strict Column Control */
+  display: grid;
+  /* Default: 2 Columns (Forces 2x2 on portrait/square) */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  /* Centers grid content */
+  justify-content: center;
+  align-content: center;
+}
+
+.style-circle .countdown-item {
+  position: relative;
+
+  /* Robust Sizing */
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  /* Fill Grid Cell */
+  height: auto;
+
+  /* Safety Cap within Cell */
+  max-width: 25rem;
+  max-height: 80vh;
+
+  /* Center in Cell */
+  justify-self: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* Container Query Context */
+  container-type: inline-size;
+}
+
+/* Wide Ratio (> 1.6): 4 Columns */
+@media (min-aspect-ratio: 16/10) {
+  .style-circle {
+    /* Switch to 4x1 Row */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.style-circle svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.style-circle circle {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.style-circle .bg-circle {
+  stroke: rgba(255, 255, 255, 0.1);
+  opacity: 0.3;
+}
+
+.style-circle .progress-circle {
+  stroke: currentColor;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.style-circle .countdown-value {
+  font-size: 30cqw;
+  font-weight: 700;
+  z-index: 2;
+  line-height: 1;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.style-circle .countdown-label {
+  font-size: 8cqw;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  z-index: 2;
+  margin-top: var(--space-2);
+}
+
+/* --- Style: Card (Boxed) --- */
+.style-card {
+  gap: clamp(2rem, 3vw, 4rem);
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.style-card .countdown-item {
+  background: var(--color-surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1rem;
+  box-shadow:
+    0 4px 24px -1px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  /* Inner glow hint */
+
+  /* Spacing: Adjusted to allow full-width separator */
+  padding: clamp(2rem, 3vw, 2.5rem);
+
+  /* Layout Default: Tall/Mobile (1 Column) */
+  flex: 1 1 80%;
+  max-width: 90%;
+
+  /* Flex Content Centering */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  transition: box-shadow var(--transition-base);
+  position: relative;
+}
+
+/* Square / Standard Ratio (0.8 - 1.6): 2 Columns (2x2 Grid) */
+@media (min-aspect-ratio: 4/5) {
+  .style-card .countdown-item {
+    flex: 1 1 40%;
+    max-width: 45%;
+  }
+}
+
+/* Wide Ratio (> 1.6): 4 Columns (Row) */
+@media (min-aspect-ratio: 16/10) {
+  .style-card .countdown-item {
+    flex: 1 1 20%;
+    max-width: 22%;
+  }
+}
+
+/* The Number */
+.style-card .countdown-value {
+  font-size: clamp(4.5rem, 11vw, 12rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-primary);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+
+  margin-bottom: var(--space-4);
+  /* Space before the separator line */
+}
+
+/* The Label */
+.style-card .countdown-label {
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  opacity: 0.9;
+
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+
+  width: 100%;
+  text-align: center;
+  padding-top: var(--space-4);
+}
+
+/* Animations */
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
