@@ -1,4 +1,4 @@
-import { store, media, send } from '@telemetryos/sdk'
+import { store, media } from '@telemetryos/sdk'
 import { useUiScaleToSetRem } from '@telemetryos/sdk/react'
 import { useEffect, useState } from 'react'
 import {
@@ -44,7 +44,6 @@ export function Render() {
 
   useEffect(() => {
     console.log('Render View Mounted', { hasInstance: !!instance, isLoadingTarget })
-    send('ready', {})
   }, [instance, isLoadingTarget])
 
   // Countdown Logic
@@ -56,19 +55,6 @@ export function Render() {
     return <div className="render">Loading...</div>
   }
 
-  // Unconfigured State check (PRD Requirement #10)
-  if (!targetDate) {
-    return (
-      <div className="render">
-        <div className="render__content">
-          <div style={{ fontSize: '2rem', opacity: 0.6 }}>
-            Please set a target date in settings.
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   // Define CSS Variables for Theming
   const styleVars = {
     '--color-primary': themePrimary || '#ffffff',
@@ -76,6 +62,36 @@ export function Render() {
     '--bg-color': background.type === 'solid' ? background.color : 'transparent',
     '--bg-opacity': background.opacity / 100,
   } as CSSProperties
+
+  // Unconfigured State check (PRD Requirement #10)
+  if (!targetDate) {
+    return (
+      <div className="render" style={{ ...styleVars, backgroundColor: '#111' }}>
+        {/* Diagnostic Status Bar for Render */}
+        <div style={{
+          position: 'absolute',
+          top: '1rem',
+          left: '1rem',
+          right: '1rem',
+          padding: '0.5rem',
+          borderRadius: '0.4rem',
+          fontSize: '0.8rem',
+          textAlign: 'center',
+          zIndex: 100,
+          backgroundColor: instance ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+          border: `1px solid ${instance ? '#4CAF50' : '#F44336'}`,
+          color: instance ? '#4CAF50' : '#888',
+        }}>
+          {instance ? 'Render View: Linked to Instance' : 'Render View: Waiting for Handshake'} | Date: "{targetDate}"
+        </div>
+        <div className="render__content">
+          <div style={{ fontSize: '2rem', color: '#fff', opacity: 0.8 }}>
+            Please set a target date in settings.
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Background Handling
   const renderBackground = () => {

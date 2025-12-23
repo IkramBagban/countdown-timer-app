@@ -1,4 +1,4 @@
-import { store, send } from '@telemetryos/sdk'
+import { store } from '@telemetryos/sdk'
 import {
   SettingsContainer,
   SettingsField,
@@ -84,7 +84,6 @@ export function Settings() {
 
   useEffect(() => {
     console.log('Settings View Mounted', { hasInstance: !!instance, isLoadingTarget })
-    send('ready', {})
   }, [instance, isLoadingTarget])
 
   return (
