@@ -1,43 +1,33 @@
+import { store } from '@telemetryos/sdk'
 import { useUiScaleToSetRem } from '@telemetryos/sdk/react'
-import wordMarkPath from '../../assets/telemetryos-wordmark.svg'
-import { useSubtitleStoreState, useUiScaleStoreState } from '../hooks/store'
+import { useTitleStoreState, useTargetDateStoreState, useDisplayStyleStoreState } from '../hooks/store'
 import './Render.css'
 
 export function Render() {
-  const [_isUiScaleLoading, uiScale] = useUiScaleStoreState()
-  useUiScaleToSetRem(uiScale)
-  const [isLoading, subtitle] = useSubtitleStoreState()
+  // Use a fixed scale for now, or implement a scale hook if needed. 
+  // The original template had useUiScaleStoreState which we removed.
+  // We can default to 1 or add a scale hook later if required by guidelines.
+  useUiScaleToSetRem(1)
+
+  const instance = store().instance
+  const [isLoadingTitle, title] = useTitleStoreState(instance)
+  const [isLoadingTarget, targetDate] = useTargetDateStoreState(instance)
+  const [isLoadingStyle, displayStyle] = useDisplayStyleStoreState(instance)
+
+  if (isLoadingTitle || isLoadingTarget || isLoadingStyle) {
+    return <div className="render">Loading...</div>
+  }
 
   return (
     <div className="render">
-      <img src={wordMarkPath} alt="TelemetryOS" className="render__logo" />
       <div className="render__hero">
-        {uiScale < 1.5 && (
-          <div className="render__hero-title">Welcome to TelemetryOS SDK</div>
-        )}
-        <div className="render__hero-subtitle">{isLoading ? 'Loading...' : subtitle}</div>
-      </div>
-      <div className="render__docs-information">
-        {uiScale < 1.2 && (
-          <>
-            <div className="render__docs-information-title">
-              To get started, edit the Render.tsx and Settings.tsx files
-            </div>
-            <div className="render__docs-information-text">
-              Visit our documentation on building applications to learn more
-            </div>
-          </>
-        )}
-        {uiScale < 1.35 && (
-          <a
-            className="render__docs-information-button"
-            href="https://docs.telemetryos.com/docs/sdk-getting-started"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Documentation
-          </a>
-        )}
+        <div className="render__hero-title">{title}</div>
+        <div className="render__hero-subtitle">
+          {targetDate ? `Target: ${new Date(targetDate).toLocaleString()}` : 'No target date set'}
+        </div>
+        <div className="render__docs-information-text">
+          Style: {displayStyle}
+        </div>
       </div>
     </div>
   )
