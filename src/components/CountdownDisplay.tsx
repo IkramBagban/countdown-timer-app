@@ -145,7 +145,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
     const renderItem = (value: number, label: string, max: number) => {
         return (
             <div className={`countdown-item`}>
-                <div className="countdown-value">{pad(value)}   </div>
+                <div className="countdown-value">{pad(value)}</div>
                 <div className="countdown-label">{label}</div>
                 {/* {style === 'circle' && (
                     <svg viewBox="0 0 100 100" className="countdown-circle-svg">

@@ -61,74 +61,7 @@
   text-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
-/* =========================================
-   Extreme Wide Ratio Optimization (> 3:1)
-   ========================================= */
-@media (min-aspect-ratio: 3/1) {
-  .render__content {
-    gap: 1.5vh;
-    padding: 1.5vh 5vw;
-  }
 
-  .render__title {
-    font-size: 5vh;
-  }
-
-  .render__cta {
-    font-size: 3.5vh;
-    margin-top: 0.5vh;
-  }
-
-  .style-card {
-    gap: 2vh;
-  }
-
-  .style-card .countdown-item {
-    max-height: 45vh;
-    padding: 1.5vh;
-    border-radius: 0.5rem;
-  }
-
-  .style-card .countdown-value {
-    font-size: 18vh;
-    margin-bottom: 0.2vh;
-  }
-
-  .style-card .countdown-label {
-    font-size: 3.5vh;
-    padding-top: 0.2vh;
-  }
-}
-
-/* Ribbons (> 6:1) */
-@media (min-aspect-ratio: 6/1) {
-  .render__content {
-    gap: 1vh;
-    padding: 0.5vh 5vw;
-  }
-
-  .render__title {
-    font-size: 4vh;
-  }
-
-  .render__cta {
-    font-size: 3vh;
-    margin-top: 0;
-  }
-
-  .style-card .countdown-item {
-    max-height: 35vh;
-    padding: 1vh;
-  }
-
-  .style-card .countdown-value {
-    font-size: 12vh;
-  }
-
-  .style-card .countdown-label {
-    font-size: 2vh;
-  }
-}
 
 /* Completion Message */
 .render__completion {
@@ -382,5 +315,123 @@
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* =========================================
+   Extreme Wide Ratio Optimization (Priority)
+   ========================================= */
+
+/* Wide Ratio (3:1) */
+@media (min-aspect-ratio: 3/1) {
+  .render__content {
+    gap: 3vh !important;
+    padding: 2vh 5vw !important;
+  }
+
+  .render__title {
+    font-size: 10vh !important;
+    max-width: 25vw !important;
+    line-height: 1.1 !important;
+  }
+
+  .render__cta {
+    font-size: 6vh !important;
+    margin-top: 0 !important;
+    max-width: 25vw !important;
+  }
+
+  .style-card {
+    gap: 3vh !important;
+  }
+
+  .style-card .countdown-item {
+    max-height: 80vh !important;
+    padding: 1vh 2vh !important;
+    border-radius: 0.5rem !important;
+    flex: 0 1 auto !important;
+    min-width: 10vw !important;
+  }
+
+  .style-card .countdown-value {
+    font-size: 35vh !important;
+    margin-bottom: 0 !important;
+  }
+
+  .style-card .countdown-label {
+    font-size: 6vh !important;
+    padding-top: 0.5vh !important;
+    letter-spacing: 0.05em !important;
+  }
+}
+
+/* Ribbons (> 6:1) - Horizontal Layout side-by-side */
+@media (min-aspect-ratio: 6/1) {
+  .render__content {
+    flex-direction: row !important;
+    justify-content: space-evenly !important;
+    gap: 2vw !important;
+    padding: 0 3vw !important;
+  }
+
+  .render__title {
+    font-size: 12vh !important;
+    text-align: left !important;
+    flex: 1 !important;
+    max-width: 20vw !important;
+    margin: 0 !important;
+  }
+
+  .render__cta {
+    font-size: 8vh !important;
+    text-align: right !important;
+    margin-top: 0 !important;
+    flex: 1 !important;
+    max-width: 20vw !important;
+  }
+
+  .countdown-container {
+    flex: 4 !important;
+    flex-wrap: nowrap !important;
+    gap: 1vw !important;
+    justify-content: center !important;
+  }
+
+  .style-card .countdown-item {
+    height: 75vh !important;
+    padding: 0.5vh 1vw !important;
+    min-width: 8vw !important;
+    flex: 0 1 auto !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .style-card .countdown-value {
+    font-size: 25vh !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .style-card .countdown-label {
+    font-size: 4.5vh !important;
+    padding-top: 0 !important;
+    margin: 0 !important;
+    letter-spacing: 0.02em !important;
+  }
+}
+
+/* Extreme Ribbons (e.g. 55:6 or > 9:1) */
+@media (min-aspect-ratio: 9/1) {
+  .style-card .countdown-value {
+    font-size: 22vh !important;
+    /* Very safe size to prevent cutoff */
+  }
+
+  .style-card .countdown-label {
+    font-size: 4vh !important;
+  }
+
+  .render__content {
+    gap: 1.5vw !important;
   }
 }

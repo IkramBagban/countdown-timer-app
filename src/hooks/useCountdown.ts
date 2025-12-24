@@ -39,7 +39,7 @@ export function useCountdown(
                 // 2. Parse the target date (User types "11:51 PM", Date parses as "11:51 PM Local")
                 const localTargetDate = new Date(targetDateStr)
                 const localTargetEpoch = localTargetDate.getTime()
-                console.log("localTarget", {localTargetDate, localTargetEpoch})
+                // console.log("localTarget", {localTargetDate, localTargetEpoch})
                 // Validation: If date is partial (e.g. "2025-12-25T--:--") the parser returns NaN
                 if (isNaN(localTargetEpoch)) {
                     setIsCompleted(false)

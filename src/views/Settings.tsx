@@ -67,13 +67,16 @@ export function Settings() {
   const [isLoadingThemeSec, themeSecondary, setThemeSecondary] = useThemeSecondaryStoreState()
   const [isLoadingBg, background, setBackground] = useBackgroundStoreState()
 
-  // Robust loading check with safety timeout
-  const [isSyncing, setIsSyncing] = useState(true)
   useEffect(() => {
-    if (!isLoadingTarget) setIsSyncing(false)
-    const timer = setTimeout(() => setIsSyncing(false), 5000) // 5s safety cap
-    return () => clearTimeout(timer)
-  }, [isLoadingTarget])
+    console.log('[SDK] Settings View Mounting', {
+      instanceId: instance.id,
+      storeLink: (store() as any)._client?.isConnected ? 'Connected' : 'Connecting...'
+    })
+  }, [instance.id])
+
+  useEffect(() => {
+    console.log('[Sync] Data Loaded:', { targetDate, timezone, displayStyle, title, visibleUnits, unitLabels, cta, completionType, completionText, themePrimary, themeSecondary, background })
+  }, [targetDate, timezone, displayStyle, title, visibleUnits, unitLabels, cta, completionType, completionText, themePrimary, themeSecondary, background, isLoadingTarget])
 
   const handleUnitToggle = (unit: keyof typeof visibleUnits) => {
     setVisibleUnits({
@@ -82,24 +85,9 @@ export function Settings() {
     })
   }
 
-  useEffect(() => {
-    console.log('Settings View Mounted', { hasInstance: !!instance, isLoadingTarget })
-  }, [instance, isLoadingTarget])
 
   return (
     <SettingsContainer>
-      {/* Diagnostic Status Bar */}
-      <div style={{
-        padding: '0.75rem',
-        marginBottom: '1rem',
-        borderRadius: '0.4rem',
-        fontSize: '1rem',
-        backgroundColor: instance.id !== 'loading...' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-        border: `1px solid ${instance.id !== 'loading...' ? '#4CAF50' : '#F44336'}`,
-        color: instance.id !== 'loading...' ? '#4CAF50' : '#444',
-      }}>
-        {instance.id !== 'loading...' ? `Linked to Studio: ${instance.id.substring(0, 8)}...` : 'Connecting to Platform SDK...'} | Sync: {isSyncing ? 'Wait' : 'Done'}
-      </div>
 
       <SettingsField>
         <SettingsLabel>Target Date & Time</SettingsLabel>
@@ -108,7 +96,6 @@ export function Settings() {
             type="datetime-local"
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
-            disabled={isSyncing}
             style={{ width: '100%', boxSizing: 'border-box' }}
           />
         </SettingsInputFrame>
@@ -120,7 +107,6 @@ export function Settings() {
           <select
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            disabled={isSyncing}
           >
             {TIMEZONES.map((tz) => (
               <option key={tz} value={tz}>
@@ -139,7 +125,6 @@ export function Settings() {
           <select
             value={displayStyle}
             onChange={(e) => setDisplayStyle(e.target.value as any)}
-            disabled={isSyncing}
           >
             <option value="card">Cards</option>
             <option value="circle">Circular Progress</option>
@@ -165,7 +150,6 @@ export function Settings() {
                     type="checkbox"
                     checked={visibleUnits[unit.id as keyof typeof visibleUnits]}
                     onChange={() => handleUnitToggle(unit.id as keyof typeof visibleUnits)}
-                    disabled={isSyncing}
                   />
                 </SettingsCheckboxFrame>
               </div>
@@ -176,7 +160,7 @@ export function Settings() {
                     value={unitLabels[unit.id as keyof typeof unitLabels]}
                     onChange={(e) => setUnitLabels({ ...unitLabels, [unit.id]: e.target.value })}
                     placeholder={unit.label}
-                    disabled={isSyncing || !visibleUnits[unit.id as keyof typeof visibleUnits]}
+                    disabled={!visibleUnits[unit.id as keyof typeof visibleUnits]}
                   />
                 </SettingsInputFrame>
               </div>
@@ -195,7 +179,6 @@ export function Settings() {
             placeholder="e.g. Grand Opening"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            disabled={isSyncing}
           />
         </SettingsInputFrame>
       </SettingsField>
@@ -207,7 +190,6 @@ export function Settings() {
             placeholder="e.g. Join us for the celebration!"
             value={cta}
             onChange={(e) => setCta(e.target.value)}
-            disabled={isSyncing}
             rows={2}
           />
         </SettingsTextAreaFrame>
@@ -224,7 +206,6 @@ export function Settings() {
             value="text"
             checked={completionType === 'text'}
             onChange={() => setCompletionType('text')}
-            disabled={isSyncing}
           />
           <SettingsRadioLabel>Show Message</SettingsRadioLabel>
         </SettingsRadioFrame>
@@ -235,7 +216,6 @@ export function Settings() {
             value="media"
             checked={completionType === 'media'}
             onChange={() => setCompletionType('media')}
-            disabled={isSyncing}
           />
           <SettingsRadioLabel>Show Media (Image/Video)</SettingsRadioLabel>
         </SettingsRadioFrame>
@@ -248,7 +228,6 @@ export function Settings() {
             <textarea
               value={completionText}
               onChange={(e) => setCompletionText(e.target.value)}
-              disabled={isSyncing}
               rows={3}
             />
           </SettingsTextAreaFrame>
@@ -275,7 +254,6 @@ export function Settings() {
                 value={themePrimary}
                 onChange={(e) => setThemePrimary(e.target.value)}
                 style={{ width: '100%', height: '3rem', padding: 0 }}
-                disabled={isSyncing}
               />
             </SettingsInputFrame>
           </div>
@@ -287,7 +265,6 @@ export function Settings() {
                 value={themeSecondary}
                 onChange={(e) => setThemeSecondary(e.target.value)}
                 style={{ width: '100%', height: '3rem', padding: 0 }}
-                disabled={isSyncing}
               />
             </SettingsInputFrame>
           </div>
@@ -302,7 +279,6 @@ export function Settings() {
           <select
             value={background.type}
             onChange={(e) => setBackground({ ...background, type: e.target.value as any })}
-            disabled={isSyncing}
           >
             <option value="default">Default</option>
             <option value="solid">Solid Color</option>
@@ -320,7 +296,6 @@ export function Settings() {
               value={background.color}
               onChange={(e) => setBackground({ ...background, color: e.target.value })}
               style={{ width: '100%', height: '3rem', padding: 0 }}
-              disabled={isSyncing}
             />
           </SettingsInputFrame>
         </SettingsField>
@@ -335,7 +310,6 @@ export function Settings() {
             max="100"
             value={background.opacity}
             onChange={(e) => setBackground({ ...background, opacity: Number(e.target.value) })}
-            disabled={isSyncing}
           />
         </SettingsSliderFrame>
       </SettingsField>

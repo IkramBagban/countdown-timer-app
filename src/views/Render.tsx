@@ -1,6 +1,6 @@
 import { store, media } from '@telemetryos/sdk'
 import { useUiScaleToSetRem } from '@telemetryos/sdk/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   useTargetDateStoreState,
   useTimezoneStoreState,
@@ -43,22 +43,22 @@ export function Render() {
   const instance = { id: (store() as any)._client?.applicationInstance || 'loading...' }
 
   useEffect(() => {
-    console.log('Render View Mounted', { hasInstance: !!instance, isLoadingTarget })
-  }, [instance, isLoadingTarget])
+    console.log('[SDK] Render View Mounting', {
+      instanceId: instance.id,
+      storeLink: (store() as any)._client?.isConnected ? 'Connected' : 'Connecting...'
+    })
+  }, [instance.id])
+
+  useEffect(() => {
+    if (targetDate) {
+      console.log('[Sync] Render Data:', { targetDate, timezone, displayStyle, title })
+    }
+  }, [targetDate, timezone, displayStyle, title, isLoadingTarget])
 
   // Countdown Logic
   const { timeLeft, isCompleted } = useCountdown(targetDate, timezone)
 
-  // Robust loading check with safety timeout
-  const [isSyncing, setIsSyncing] = useState(true)
-  useEffect(() => {
-    // If we have data OR any of the main loaders finished, we can stop the "blocking" spinner
-    if (!isLoadingTarget || targetDate) setIsSyncing(false)
-    const timer = setTimeout(() => setIsSyncing(false), 5000) // 5s safety cap
-    return () => clearTimeout(timer)
-  }, [isLoadingTarget, targetDate])
-
-  // Define CSS Variables for Theming (even during loading)
+  // Define CSS Variables for Theming
   const styleVars = {
     '--color-primary': themePrimary || '#ffffff',
     '--color-secondary': themeSecondary || '#F8B334',
@@ -79,38 +79,12 @@ export function Render() {
     return <div className="render__background" style={{ opacity: (background?.opacity || 100) / 100 }} />
   }
 
-  // Render Diagnostics and Logic
   return (
     <div className="render" style={{ ...styleVars, backgroundColor: '#000' }}>
-      {/* Diagnostic Status Bar for Render - ALWAYS VISIBLE */}
-      <div style={{
-        position: 'absolute',
-        top: '1rem',
-        left: '1rem',
-        right: '1rem',
-        padding: '0.5rem',
-        borderRadius: '0.4rem',
-        fontSize: '0.8rem',
-        textAlign: 'center',
-        zIndex: 1000,
-        backgroundColor: instance.id !== 'loading...' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
-        border: `1px solid ${instance.id !== 'loading...' ? '#4CAF50' : '#F44336'}`,
-        color: instance.id !== 'loading...' ? '#4CAF50' : '#FF5252',
-      }}>
-        {instance.id !== 'loading...' ? `Linked: ${instance.id.substring(0, 8)}...` : 'Connecting to Telemetry Bridge...'} | Sync: {isSyncing ? 'Wait' : 'Done'} | Date: {targetDate || 'None'}
-      </div>
-
-      {isSyncing ? (
-        <div className="render__content">
-          <div style={{ fontSize: '2rem', color: '#fff', textAlign: 'center' }}>
-            Initializing Countdown...<br />
-            <span style={{ fontSize: '1rem', opacity: 0.6 }}>Waiting for platform handshake</span>
-          </div>
-        </div>
-      ) : !targetDate ? (
+      {!targetDate ? (
         <div className="render__content">
           <div style={{ fontSize: '2rem', color: '#fff', padding: '2rem', textAlign: 'center' }}>
-            <div style={{ marginBottom: '1rem' }}>⏰</div>
+            {/* <div style={{ marginBottom: '1rem' }}>⏰</div> */}
             Please set a target date in settings.
           </div>
         </div>
