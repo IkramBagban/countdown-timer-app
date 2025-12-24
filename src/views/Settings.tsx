@@ -94,11 +94,11 @@ export function Settings() {
         marginBottom: '1rem',
         borderRadius: '0.4rem',
         fontSize: '1rem',
-        backgroundColor: instance ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-        border: `1px solid ${instance ? '#4CAF50' : '#F44336'}`,
-        color: instance ? '#4CAF50' : '#444',
+        backgroundColor: instance.id !== 'loading...' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+        border: `1px solid ${instance.id !== 'loading...' ? '#4CAF50' : '#F44336'}`,
+        color: instance.id !== 'loading...' ? '#4CAF50' : '#444',
       }}>
-        {instance ? 'Linked to Studio Instance' : 'Waiting for Platform SDK Handshake (Check your App Slug)...'}
+        {instance.id !== 'loading...' ? `Linked to Studio: ${instance.id.substring(0, 8)}...` : 'Connecting to Platform SDK...'} | Sync: {isSyncing ? 'Wait' : 'Done'}
       </div>
 
       <SettingsField>

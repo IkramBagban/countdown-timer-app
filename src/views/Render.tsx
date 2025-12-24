@@ -49,53 +49,26 @@ export function Render() {
   // Countdown Logic
   const { timeLeft, isCompleted } = useCountdown(targetDate, timezone)
 
-  const isLoading = isLoadingTarget || isLoadingTz || isLoadingStyle
+  // Robust loading check with safety timeout
+  const [isSyncing, setIsSyncing] = useState(true)
+  useEffect(() => {
+    // If we have data OR any of the main loaders finished, we can stop the "blocking" spinner
+    if (!isLoadingTarget || targetDate) setIsSyncing(false)
+    const timer = setTimeout(() => setIsSyncing(false), 5000) // 5s safety cap
+    return () => clearTimeout(timer)
+  }, [isLoadingTarget, targetDate])
 
-  if (isLoading) {
-    return <div className="render">Loading...</div>
-  }
-
-  // Define CSS Variables for Theming
+  // Define CSS Variables for Theming (even during loading)
   const styleVars = {
     '--color-primary': themePrimary || '#ffffff',
     '--color-secondary': themeSecondary || '#F8B334',
-    '--bg-color': background.type === 'solid' ? background.color : 'transparent',
-    '--bg-opacity': background.opacity / 100,
+    '--bg-color': background?.type === 'solid' ? background.color : '#111',
+    '--bg-opacity': (background?.opacity || 100) / 100,
   } as CSSProperties
-
-  // Unconfigured State check (PRD Requirement #10)
-  if (!targetDate) {
-    return (
-      <div className="render" style={{ ...styleVars, backgroundColor: '#111' }}>
-        {/* Diagnostic Status Bar for Render */}
-        <div style={{
-          position: 'absolute',
-          top: '1rem',
-          left: '1rem',
-          right: '1rem',
-          padding: '0.5rem',
-          borderRadius: '0.4rem',
-          fontSize: '0.8rem',
-          textAlign: 'center',
-          zIndex: 100,
-          backgroundColor: instance ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-          border: `1px solid ${instance ? '#4CAF50' : '#F44336'}`,
-          color: instance ? '#4CAF50' : '#888',
-        }}>
-          {instance ? 'Render View: Linked to Instance' : 'Render View: Waiting for Handshake'} | Date: "{targetDate}"
-        </div>
-        <div className="render__content">
-          <div style={{ fontSize: '2rem', color: '#fff', opacity: 0.8 }}>
-            Please set a target date in settings.
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   // Background Handling
   const renderBackground = () => {
-    if (background.type === 'solid') {
+    if (background?.type === 'solid') {
       return (
         <div
           className="render__background"
@@ -103,47 +76,79 @@ export function Render() {
         />
       )
     }
-    // TODO: Handle Media background with SDK when available.
-    // For now, if "media", just show a placeholder or transparent if no logic.
-    return <div className="render__background" style={{ opacity: background.opacity / 100 }} />
+    return <div className="render__background" style={{ opacity: (background?.opacity || 100) / 100 }} />
   }
 
+  // Render Diagnostics and Logic
   return (
-    <div className="render" style={styleVars}>
-      {renderBackground()}
-
-      <div className="render__content">
-        {/* Header: Title (Hide on completion) */}
-        {!isCompleted && title && <h1 className="render__title">{title}</h1>}
-
-        {/* Main: Timer or Completion */}
-        {!isCompleted ? (
-          <CountdownDisplay
-            timeLeft={timeLeft}
-            style={displayStyle}
-            visibleUnits={visibleUnits}
-            unitLabels={unitLabels}
-            primaryColor={themePrimary}
-          />
-        ) : (
-          /* Completion State: Replacement content */
-          <>
-            {completionType === 'text' ? (
-              completionText && <div className="render__completion">{completionText}</div>
-            ) : (
-              /* Media Placeholder (Stage 2) - Only if configured */
-              completionMediaId && (
-                <div className="render__media-placeholder">
-                  <span style={{ fontSize: '2rem' }}>Media Display (Stage 2)</span>
-                </div>
-              )
-            )}
-          </>
-        )}
-
-        {/* Footer: CTA (Hide on completion) */}
-        {!isCompleted && cta && <div className="render__cta">{cta}</div>}
+    <div className="render" style={{ ...styleVars, backgroundColor: '#000' }}>
+      {/* Diagnostic Status Bar for Render - ALWAYS VISIBLE */}
+      <div style={{
+        position: 'absolute',
+        top: '1rem',
+        left: '1rem',
+        right: '1rem',
+        padding: '0.5rem',
+        borderRadius: '0.4rem',
+        fontSize: '0.8rem',
+        textAlign: 'center',
+        zIndex: 1000,
+        backgroundColor: instance.id !== 'loading...' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+        border: `1px solid ${instance.id !== 'loading...' ? '#4CAF50' : '#F44336'}`,
+        color: instance.id !== 'loading...' ? '#4CAF50' : '#FF5252',
+      }}>
+        {instance.id !== 'loading...' ? `Linked: ${instance.id.substring(0, 8)}...` : 'Connecting to Telemetry Bridge...'} | Sync: {isSyncing ? 'Wait' : 'Done'} | Date: {targetDate || 'None'}
       </div>
+
+      {isSyncing ? (
+        <div className="render__content">
+          <div style={{ fontSize: '2rem', color: '#fff', textAlign: 'center' }}>
+            Initializing Countdown...<br />
+            <span style={{ fontSize: '1rem', opacity: 0.6 }}>Waiting for platform handshake</span>
+          </div>
+        </div>
+      ) : !targetDate ? (
+        <div className="render__content">
+          <div style={{ fontSize: '2rem', color: '#fff', padding: '2rem', textAlign: 'center' }}>
+            <div style={{ marginBottom: '1rem' }}>⏰</div>
+            Please set a target date in settings.
+          </div>
+        </div>
+      ) : (
+        <>
+          {renderBackground()}
+          <div className="render__content">
+            {/* Header: Title (Hide on completion) */}
+            {!isCompleted && title && <h1 className="render__title">{title}</h1>}
+
+            {/* Main: Timer or Completion */}
+            {!isCompleted ? (
+              <CountdownDisplay
+                timeLeft={timeLeft}
+                style={displayStyle}
+                visibleUnits={visibleUnits}
+                unitLabels={unitLabels}
+                primaryColor={themePrimary}
+              />
+            ) : (
+              <div className="render__completion-container">
+                {completionType === 'text' ? (
+                  completionText && <div className="render__completion">{completionText}</div>
+                ) : (
+                  completionMediaId && (
+                    <div className="render__media-placeholder">
+                      <span style={{ fontSize: '2rem' }}>Media State</span>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
+            {/* Footer: CTA (Hide on completion) */}
+            {!isCompleted && cta && <div className="render__cta">{cta}</div>}
+          </div>
+        </>
+      )}
     </div>
   )
 }
