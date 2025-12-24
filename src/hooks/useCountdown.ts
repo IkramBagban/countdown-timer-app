@@ -37,7 +37,15 @@ export function useCountdown(
                 const diffMs = localNowInTarget.getTime() - now.getTime()
 
                 // 2. Parse the target date (User types "11:51 PM", Date parses as "11:51 PM Local")
-                const localTargetEpoch = new Date(targetDateStr).getTime()
+                const localTargetDate = new Date(targetDateStr)
+                const localTargetEpoch = localTargetDate.getTime()
+                console.log("localTarget", {localTargetDate, localTargetEpoch})
+                // Validation: If date is partial (e.g. "2025-12-25T--:--") the parser returns NaN
+                if (isNaN(localTargetEpoch)) {
+                    setIsCompleted(false)
+                    setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+                    return
+                }
 
                 // 3. Subtract the offset to get the real UTC epoch of that "Wall Clock Time"
                 const targetEpoch = localTargetEpoch - diffMs

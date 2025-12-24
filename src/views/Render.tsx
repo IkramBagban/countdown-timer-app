@@ -40,7 +40,7 @@ export function Render() {
   const [isLoadingThemeSec, themeSecondary] = useThemeSecondaryStoreState()
   const [isLoadingBg, background] = useBackgroundStoreState()
 
-  const instance = { id: (store() as any)._applicationInstance || 'loading...' }
+  const instance = { id: (store() as any)._client?.applicationInstance || 'loading...' }
 
   useEffect(() => {
     console.log('Render View Mounted', { hasInstance: !!instance, isLoadingTarget })

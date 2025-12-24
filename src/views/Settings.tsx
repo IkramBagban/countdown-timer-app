@@ -51,7 +51,7 @@ if (!TIMEZONES.includes(localTz)) {
 }
 
 export function Settings() {
-  const instance = { id: (store() as any)._applicationInstance || 'loading...' }
+  const instance = { id: (store() as any)._client?.applicationInstance || 'loading...' }
 
   // Instance scoping is now handled automatically by use...InstanceStoreState hooks
   const [isLoadingTarget, targetDate, setTargetDate] = useTargetDateStoreState()
