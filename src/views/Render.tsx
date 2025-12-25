@@ -23,6 +23,8 @@ import { CountdownDisplay } from '../components/CountdownDisplay'
 import './Render.css'
 import { CSSProperties, useState } from 'react'
 
+import { ErrorBoundary } from '../components/ErrorBoundary'
+
 export function Render() {
   const [isLoadingScale, uiScale] = useUiScaleStoreState()
   useUiScaleToSetRem(uiScale)
@@ -100,9 +102,14 @@ export function Render() {
 
   useEffect(() => {
     if (background.type === 'media' && background.mediaId) {
-      media().getById(background.mediaId)
-        .then(m => setBackgroundUrl(m.publicUrls[0] || ''))
-        .catch(err => console.error('Error fetching background media:', err))
+      // DEV: Allow utilizing direct URLs for local testing
+      if (background.mediaId.startsWith('http')) {
+        setBackgroundUrl(background.mediaId)
+      } else {
+        media().getById(background.mediaId)
+          .then(m => setBackgroundUrl(m.publicUrls[0] || ''))
+          .catch(err => console.error('Error fetching background media:', err))
+      }
     } else {
       setBackgroundUrl('')
     }
@@ -110,9 +117,14 @@ export function Render() {
 
   useEffect(() => {
     if (completionType === 'media' && completionMediaId) {
-      media().getById(completionMediaId)
-        .then(m => setCompletionUrl(m.publicUrls[0] || ''))
-        .catch(err => console.error('Error fetching completion media:', err))
+      // DEV: Allow utilizing direct URLs for local testing
+      if (completionMediaId.startsWith('http')) {
+        setCompletionUrl(completionMediaId)
+      } else {
+        media().getById(completionMediaId)
+          .then(m => setCompletionUrl(m.publicUrls[0] || ''))
+          .catch(err => console.error('Error fetching completion media:', err))
+      }
     } else {
       setCompletionUrl('')
     }
@@ -148,62 +160,64 @@ export function Render() {
   }
 
   return (
-    <div className="render" style={{ ...styleVars, backgroundColor: '#000' }}>
-      {!targetDate ? (
-        <div className="render__content">
-          <div style={{ fontSize: '2rem', color: '#fff', padding: '2rem', textAlign: 'center' }}>
-            {/* <div style={{ marginBottom: '1rem' }}>⏰</div> */}
-            Please set a target date in settings.
-          </div>
-        </div>
-      ) : (
-        <>
-          {renderBackground()}
+    <ErrorBoundary location="Render View">
+      <div className="render" style={{ ...styleVars, backgroundColor: '#000' }}>
+        {!targetDate ? (
           <div className="render__content">
-            {/* Header: Title (Hide on completion) */}
-            {!isCompleted && title && <h1 className="render__title">{title}</h1>}
-
-            {/* Main: Timer or Completion */}
-            {!isCompleted ? (
-              <CountdownDisplay
-                timeLeft={timeLeft}
-                style={displayStyle}
-                visibleUnits={visibleUnits}
-                unitLabels={unitLabels}
-                primaryColor={themePrimary}
-              />
-            ) : (
-              <div className="render__completion-container">
-                {!hasExpired ? (
-                  <>
-                    {completionType === 'text' ? (
-                      completionText && <div className="render__completion">{completionText}</div>
-                    ) : (
-                      completionUrl && (
-                        <div className="render__completion-media">
-                          {completionUrl.match(/\.(mp4|webm|ogg)$/i) ? (
-                            <video src={completionUrl} autoPlay loop muted className="render__media" />
-                          ) : (
-                            <img src={completionUrl} alt="Completion" className="render__media" />
-                          )}
-                        </div>
-                      )
-                    )}
-                  </>
-                ) : (
-                  <div className="render__expired-placeholder">
-                    {/* Blank screen when expired */}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Footer: CTA (Hide on completion) */}
-            {!isCompleted && cta && <div className="render__cta">{cta}</div>}
+            <div style={{ fontSize: '2rem', color: '#fff', padding: '2rem', textAlign: 'center' }}>
+              {/* <div style={{ marginBottom: '1rem' }}>⏰</div> */}
+              Please set a target date in settings.
+            </div>
           </div>
-        </>
-      )}
-    </div>
+        ) : (
+          <>
+            {renderBackground()}
+            <div className="render__content">
+              {/* Header: Title (Hide on completion) */}
+              {!isCompleted && title && <h1 className="render__title">{title}</h1>}
+
+              {/* Main: Timer or Completion */}
+              {!isCompleted ? (
+                <CountdownDisplay
+                  timeLeft={timeLeft}
+                  style={displayStyle}
+                  visibleUnits={visibleUnits}
+                  unitLabels={unitLabels}
+                  primaryColor={themePrimary}
+                />
+              ) : (
+                <div className="render__completion-container">
+                  {!hasExpired ? (
+                    <>
+                      {completionType === 'text' ? (
+                        completionText && <div className="render__completion">{completionText}</div>
+                      ) : (
+                        completionUrl && (
+                          <div className="render__completion-media">
+                            {completionUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+                              <video src={completionUrl} autoPlay loop muted className="render__media" />
+                            ) : (
+                              <img src={completionUrl} alt="Completion" className="render__media" />
+                            )}
+                          </div>
+                        )
+                      )}
+                    </>
+                  ) : (
+                    <div className="render__expired-placeholder">
+                      {/* Blank screen when expired */}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Footer: CTA (Hide on completion) */}
+              {!isCompleted && cta && <div className="render__cta">{cta}</div>}
+            </div>
+          </>
+        )}
+      </div>
+    </ErrorBoundary>
   )
 }
 

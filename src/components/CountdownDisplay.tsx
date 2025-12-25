@@ -86,29 +86,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
     const showH = visibleUnits.hours
     const showD = visibleUnits.days
 
-    // Apply Round Up Logic
-    // If Seconds are HIDDEN, we might need to bump Minutes
-    if (!showS && s > 0) {
-        // Seconds are hidden but non-zero.
-        // If Minutes are visible, bump them.
-        if (showM) {
-            m += 1
-            // Handle overflow (e.g. 59m + 1 -> 60m? Or 0m + 1h? Usually 60m is fine or rollover)
-            // Ideally rollover: if m becomes 60, m=0, h+=1.
-            if (m === 60) {
-                m = 0
-                h += 1
-                if (h === 24) {
-                    h = 0
-                    d += 1
-                }
-            }
-        } else if (showH) {
-            // Minutes also hidden (or bump logic propagated), bump Hours
-            // But we assume if M is hidden, we check if M>0 OR S>0
-            // Let's simplify: Accumulate total "remainder" time from hidden lower units?
-        }
-    }
+
 
     // Wait, the logic is strictly: "until the hidden seconds reach zero".
     // This implies we function like a ceil().
