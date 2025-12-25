@@ -28,7 +28,9 @@ import {
   useThemePrimaryStoreState,
   useThemeSecondaryStoreState,
   useBackgroundStoreState,
-  // useCompletionMediaIdStoreState, // TODO: Add media picker when available
+  useCompletionDurationStoreState,
+  useUiScaleStoreState,
+  useCompletionMediaIdStoreState,
 } from '../hooks/store'
 
 // Common IANA timezones (simplified list)
@@ -66,6 +68,9 @@ export function Settings() {
   const [isLoadingThemePri, themePrimary, setThemePrimary] = useThemePrimaryStoreState()
   const [isLoadingThemeSec, themeSecondary, setThemeSecondary] = useThemeSecondaryStoreState()
   const [isLoadingBg, background, setBackground] = useBackgroundStoreState()
+  const [isLoadingDuration, completionDuration, setCompletionDuration] = useCompletionDurationStoreState()
+  const [isLoadingScale, uiScale, setUiScale] = useUiScaleStoreState()
+  const [isLoadingCompMedia, completionMediaId, setCompletionMediaId] = useCompletionMediaIdStoreState()
 
   useEffect(() => {
     console.log('[SDK] Settings View Mounting', {
@@ -75,8 +80,8 @@ export function Settings() {
   }, [instance.id])
 
   useEffect(() => {
-    console.log('[Sync] Data Loaded:', { targetDate, timezone, displayStyle, title, visibleUnits, unitLabels, cta, completionType, completionText, themePrimary, themeSecondary, background })
-  }, [targetDate, timezone, displayStyle, title, visibleUnits, unitLabels, cta, completionType, completionText, themePrimary, themeSecondary, background, isLoadingTarget])
+    console.log('[Sync] Data Loaded:', { targetDate, timezone, displayStyle, title, visibleUnits, unitLabels, cta, completionType, completionText, themePrimary, themeSecondary, background, completionDuration, uiScale })
+  }, [targetDate, timezone, displayStyle, title, visibleUnits, unitLabels, cta, completionType, completionText, themePrimary, themeSecondary, background, isLoadingTarget, completionDuration, uiScale])
 
   const handleUnitToggle = (unit: keyof typeof visibleUnits) => {
     setVisibleUnits({
@@ -118,6 +123,20 @@ export function Settings() {
       </SettingsField>
 
       <SettingsDivider />
+
+      <SettingsField>
+        <SettingsLabel>UI Scale: {uiScale}x</SettingsLabel>
+        <SettingsSliderFrame>
+          <input
+            type="range"
+            min={1}
+            max={3}
+            step={0.05}
+            value={uiScale}
+            onChange={(e) => setUiScale(parseFloat(e.target.value))}
+          />
+        </SettingsSliderFrame>
+      </SettingsField>
 
       <SettingsField>
         <SettingsLabel>Display Style</SettingsLabel>
@@ -234,12 +253,37 @@ export function Settings() {
         </SettingsField>
       ) : (
         <SettingsField>
-          <SettingsLabel>Media</SettingsLabel>
-          <div style={{ fontSize: '1.2rem', opacity: 0.7, padding: '0.5rem 0' }}>
-            Media picker will be implemented in Stage 2.
+          <SettingsLabel>Completion Media ID</SettingsLabel>
+          <SettingsInputFrame>
+            <input
+              type="text"
+              placeholder="Enter Media ID from Library"
+              value={completionMediaId}
+              onChange={(e) => setCompletionMediaId(e.target.value)}
+            />
+          </SettingsInputFrame>
+          <div style={{ fontSize: '1.2rem', opacity: 0.6, marginTop: '0.4rem' }}>
+            Enter the ID of the image or video from your TelemetryOS Media Library.
           </div>
         </SettingsField>
       )}
+
+      <SettingsField>
+        <SettingsLabel>Display Duration (Minutes)</SettingsLabel>
+        <SettingsInputFrame>
+          <input
+            type="number"
+            min={0}
+            step={1}
+            value={completionDuration}
+            onChange={(e) => setCompletionDuration(parseInt(e.target.value) || 0)}
+            placeholder="0 for Indefinite"
+          />
+        </SettingsInputFrame>
+        <div style={{ fontSize: '1.2rem', opacity: 0.6, marginTop: '0.4rem' }}>
+          How long to show the completion message before clearing the screen. Use 0 for indefinite.
+        </div>
+      </SettingsField>
 
       <SettingsDivider />
 
@@ -298,6 +342,22 @@ export function Settings() {
               style={{ width: '100%', height: '3rem', padding: 0 }}
             />
           </SettingsInputFrame>
+        </SettingsField>
+      )}
+      {background.type === 'media' && (
+        <SettingsField>
+          <SettingsLabel>Background Media ID</SettingsLabel>
+          <SettingsInputFrame>
+            <input
+              type="text"
+              placeholder="Enter Media ID from Library"
+              value={background.mediaId}
+              onChange={(e) => setBackground({ ...background, mediaId: e.target.value })}
+            />
+          </SettingsInputFrame>
+          <div style={{ fontSize: '1.2rem', opacity: 0.6, marginTop: '0.4rem' }}>
+            Enter the ID of the background image or video.
+          </div>
         </SettingsField>
       )}
 

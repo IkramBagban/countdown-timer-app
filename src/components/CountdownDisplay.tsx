@@ -24,23 +24,42 @@ interface CountdownDisplayProps {
     primaryColor: string
 }
 
+function FlipCard({ value, label }: { value: string, label: string }) {
+    const [currentValue, setCurrentValue] = React.useState(value)
+    const [nextValue, setNextValue] = React.useState(value)
+    const [isAnimating, setIsAnimating] = React.useState(false)
+
+    React.useEffect(() => {
+        if (value !== nextValue) {
+            setNextValue(value)
+            setIsAnimating(true)
+            const timer = setTimeout(() => {
+                setCurrentValue(value)
+                setIsAnimating(false)
+            }, 600) // Match CSS transition duration
+            return () => clearTimeout(timer)
+        }
+    }, [value, nextValue])
+
+    return (
+        <div className={`countdown-flip-unit ${isAnimating ? 'animating' : ''}`}>
+            <div className="flip-card">
+                {/* Static Backgrounds */}
+                <div className="top-next"><span>{nextValue}</span></div>
+                <div className="bottom-current"><span>{currentValue}</span></div>
+
+                {/* The Moving Leaf */}
+                <div className="leaf">
+                    <div className="leaf-front"><span>{currentValue}</span></div>
+                    <div className="leaf-back"><span>{nextValue}</span></div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, primaryColor }: CountdownDisplayProps) {
 
-    // Stage 1 Limit: Disable Digital and Flip
-    if (style === 'digital' || style === 'flip' || style === 'circle') {
-        let styleText = style === 'digital' ? 'Digital LED' : style === 'flip' ? 'Flip Clock' : 'Circular Progress'
-        return (
-            <div className="stage-placeholder" style={{
-                fontSize: '1.5rem',
-                opacity: 0.7,
-                border: '0.0625rem dashed currentColor',
-                padding: '2rem',
-                borderRadius: '0.5rem'
-            }}>
-                {styleText} Style Coming in Stage 2
-            </div>
-        )
-    }
 
     // Helper to pad numbers
     const pad = (num: number) => num.toString().padStart(2, '0')
@@ -145,19 +164,43 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
     const renderItem = (value: number, label: string, max: number) => {
         return (
             <div className={`countdown-item`}>
-                <div className="countdown-value">{pad(value)}</div>
-                <div className="countdown-label">{label}</div>
-                {/* {style === 'circle' && (
-                    <svg viewBox="0 0 100 100" className="countdown-circle-svg">
-                        <circle className="bg-circle" cx="50" cy="50" r="40" />
-                        <circle
-                            className="progress-circle"
-                            cx="50" cy="50" r="40"
-                            strokeDasharray={2 * Math.PI * 40}
-                            strokeDashoffset={(2 * Math.PI * 40) - ((value / max) * (2 * Math.PI * 40))}
-                        />
-                    </svg>
-                )} */}
+                {style === 'circle' && (
+                    <div className="countdown-circle-container">
+                        <svg viewBox="0 0 100 100" className="countdown-circle-svg">
+                            <circle className="bg-circle" cx="50" cy="50" r="45" strokeWidth="8" />
+                            <circle
+                                className="progress-circle"
+                                cx="50" cy="50" r="45"
+                                strokeWidth="8"
+                                strokeDasharray={2 * Math.PI * 45}
+                                strokeDashoffset={(2 * Math.PI * 45) - ((value / max) * (2 * Math.PI * 45))}
+                            />
+                        </svg>
+                        <div className="countdown-content">
+                            <div className="countdown-value">{pad(value)}</div>
+                            <div className="countdown-label">{label}</div>
+                        </div>
+                    </div>
+                )}
+
+                {style === 'flip' && (
+                    <div className="countdown-flip-group">
+                        <div className="countdown-flip-digits">
+                            {pad(value).split('').map((digit, idx) => (
+                                <FlipCard key={idx} value={digit} label="" />
+                            ))}
+                        </div>
+                        <div className="countdown-label">{label}</div>
+                    </div>
+                )}
+
+                {(style === 'card' || style === 'digital') && (
+                    <>
+                        <div className="countdown-value">{pad(value)}</div>
+                        <div className="countdown-separator"></div>
+                        <div className="countdown-label">{label}</div>
+                    </>
+                )}
             </div>
         )
     }

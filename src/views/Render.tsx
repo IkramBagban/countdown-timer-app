@@ -15,15 +15,17 @@ import {
   useThemePrimaryStoreState,
   useThemeSecondaryStoreState,
   useBackgroundStoreState,
+  useCompletionDurationStoreState,
+  useUiScaleStoreState,
 } from '../hooks/store'
 import { useCountdown } from '../hooks/useCountdown'
 import { CountdownDisplay } from '../components/CountdownDisplay'
 import './Render.css'
-import { CSSProperties } from 'react'
+import { CSSProperties, useState } from 'react'
 
 export function Render() {
-  // Responsive Scaling
-  useUiScaleToSetRem(1)
+  const [isLoadingScale, uiScale] = useUiScaleStoreState()
+  useUiScaleToSetRem(uiScale)
 
   // Instance scoping is now handled automatically by hooks
   const [isLoadingTarget, targetDate] = useTargetDateStoreState()
@@ -39,6 +41,7 @@ export function Render() {
   const [isLoadingThemePri, themePrimary] = useThemePrimaryStoreState()
   const [isLoadingThemeSec, themeSecondary] = useThemeSecondaryStoreState()
   const [isLoadingBg, background] = useBackgroundStoreState()
+  const [isLoadingDuration, completionDuration] = useCompletionDurationStoreState()
 
   const instance = { id: (store() as any)._client?.applicationInstance || 'loading...' }
 
@@ -58,6 +61,31 @@ export function Render() {
   // Countdown Logic
   const { timeLeft, isCompleted } = useCountdown(targetDate, timezone)
 
+  // Completion Duration Logic
+  const [hasExpired, setHasExpired] = useState(false)
+
+  useEffect(() => {
+    // Reset expiration if target date changes or countdown is active
+    if (!isCompleted) {
+      setHasExpired(false)
+      return
+    }
+
+    // If duration is 0, it stays indefinitely
+    if (completionDuration <= 0) {
+      setHasExpired(false)
+      return
+    }
+
+    console.log(`[Timer] Starting completion visibility timer: ${completionDuration} minutes`)
+    const timer = setTimeout(() => {
+      console.log('[Timer] Completion duration expired. Hiding content.')
+      setHasExpired(true)
+    }, completionDuration * 60 * 1000)
+
+    return () => clearTimeout(timer)
+  }, [isCompleted, completionDuration, targetDate])
+
   // Define CSS Variables for Theming
   const styleVars = {
     '--color-primary': themePrimary || '#ffffff',
@@ -66,17 +94,57 @@ export function Render() {
     '--bg-opacity': (background?.opacity || 100) / 100,
   } as CSSProperties
 
+  // Media Fetching Logic
+  const [backgroundUrl, setBackgroundUrl] = useState<string>('')
+  const [completionUrl, setCompletionUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (background.type === 'media' && background.mediaId) {
+      media().getById(background.mediaId)
+        .then(m => setBackgroundUrl(m.publicUrls[0] || ''))
+        .catch(err => console.error('Error fetching background media:', err))
+    } else {
+      setBackgroundUrl('')
+    }
+  }, [background.type, background.mediaId])
+
+  useEffect(() => {
+    if (completionType === 'media' && completionMediaId) {
+      media().getById(completionMediaId)
+        .then(m => setCompletionUrl(m.publicUrls[0] || ''))
+        .catch(err => console.error('Error fetching completion media:', err))
+    } else {
+      setCompletionUrl('')
+    }
+  }, [completionType, completionMediaId])
+
   // Background Handling
   const renderBackground = () => {
+    const opacity = (background?.opacity || 100) / 100
+
     if (background?.type === 'solid') {
       return (
         <div
           className="render__background"
-          style={{ backgroundColor: background.color, opacity: background.opacity / 100 }}
+          style={{ backgroundColor: background.color, opacity }}
         />
       )
     }
-    return <div className="render__background" style={{ opacity: (background?.opacity || 100) / 100 }} />
+
+    if (background?.type === 'media' && backgroundUrl) {
+      const isVideo = backgroundUrl.match(/\.(mp4|webm|ogg)$/i)
+      return (
+        <div className="render__background" style={{ opacity }}>
+          {isVideo ? (
+            <video src={backgroundUrl} autoPlay loop muted className="render__media" />
+          ) : (
+            <img src={backgroundUrl} alt="Background" className="render__media" />
+          )}
+        </div>
+      )
+    }
+
+    return <div className="render__background" style={{ opacity }} />
   }
 
   return (
@@ -106,14 +174,26 @@ export function Render() {
               />
             ) : (
               <div className="render__completion-container">
-                {completionType === 'text' ? (
-                  completionText && <div className="render__completion">{completionText}</div>
+                {!hasExpired ? (
+                  <>
+                    {completionType === 'text' ? (
+                      completionText && <div className="render__completion">{completionText}</div>
+                    ) : (
+                      completionUrl && (
+                        <div className="render__completion-media">
+                          {completionUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+                            <video src={completionUrl} autoPlay loop muted className="render__media" />
+                          ) : (
+                            <img src={completionUrl} alt="Completion" className="render__media" />
+                          )}
+                        </div>
+                      )
+                    )}
+                  </>
                 ) : (
-                  completionMediaId && (
-                    <div className="render__media-placeholder">
-                      <span style={{ fontSize: '2rem' }}>Media State</span>
-                    </div>
-                  )
+                  <div className="render__expired-placeholder">
+                    {/* Blank screen when expired */}
+                  </div>
                 )}
               </div>
             )}

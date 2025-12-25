@@ -51,10 +51,14 @@ export const useCtaStoreState = createUseInstanceStoreState<string>('cta', '')
 export const useCompletionTypeStoreState = createUseInstanceStoreState<CompletionType>('completionType', 'text')
 export const useCompletionTextStoreState = createUseInstanceStoreState<string>('completionText', '')
 export const useCompletionMediaIdStoreState = createUseInstanceStoreState<string>('completionMediaId', '')
+export const useCompletionDurationStoreState = createUseInstanceStoreState<number>('completionDuration', 0) // minutes, 0 = indefinite
 
 // Theme
 export const useThemePrimaryStoreState = createUseInstanceStoreState<string>('themePrimary', '#FFFFFF')
 export const useThemeSecondaryStoreState = createUseInstanceStoreState<string>('themeSecondary', '#F8B334')
+
+// Scaling
+export const useUiScaleStoreState = createUseInstanceStoreState<number>('uiScale', 1)
 
 // Background
 export const useBackgroundStoreState = createUseInstanceStoreState<BackgroundConfig>('background', {
