@@ -35,6 +35,7 @@ import {
 
 // Common IANA timezones (simplified list)
 const TIMEZONES = [
+  'Device Time',
   'UTC',
   'America/New_York',
   'America/Los_Angeles',

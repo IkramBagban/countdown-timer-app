@@ -32,9 +32,15 @@ export function useCountdown(
 
                 // 1. Calculate the offset difference between Local Browser Time and Target Timezone
                 // This correctly maps the "Floating" time typed in the settings to its absolute UTC moment.
-                const localNowInTargetStr = now.toLocaleString('en-US', { timeZone: timezoneString })
-                const localNowInTarget = new Date(localNowInTargetStr)
-                const diffMs = localNowInTarget.getTime() - now.getTime()
+                let diffMs = 0
+
+                if (timezoneString !== 'Device Time') {
+                    // Only calculate offset if we are NOT using Device Time.
+                    // If Device Time is selected, we want 12:00 AM input to equal 12:00 AM on the device (diff = 0).
+                    const localNowInTargetStr = now.toLocaleString('en-US', { timeZone: timezoneString })
+                    const localNowInTarget = new Date(localNowInTargetStr)
+                    diffMs = localNowInTarget.getTime() - now.getTime()
+                }
 
                 // 2. Parse the target date (User types "11:51 PM", Date parses as "11:51 PM Local")
                 const localTargetDate = new Date(targetDateStr)
