@@ -163,12 +163,8 @@ export function Render() {
     <ErrorBoundary location="Render View">
       <div className="render" style={{ ...styleVars, backgroundColor: '#000' }}>
         {!targetDate ? (
-          <div className="render__content">
-            <div style={{ fontSize: '2rem', color: '#fff', padding: '2rem', textAlign: 'center' }}>
-              {/* <div style={{ marginBottom: '1rem' }}>⏰</div> */}
-              Please set a target date in settings.
-            </div>
-          </div>
+          // Requirement: Unconfigured state display blank screen on render
+          <div className="render__content"></div>
         ) : (
           <>
             {renderBackground()}

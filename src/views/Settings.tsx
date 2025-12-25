@@ -108,6 +108,11 @@ export function Settings() {
               style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </SettingsInputFrame>
+          {!targetDate && (
+            <div style={{ color: '#ff6b6b', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+              lease set a target date to start the countdown.
+            </div>
+          )}
         </SettingsField>
 
         <SettingsField>
