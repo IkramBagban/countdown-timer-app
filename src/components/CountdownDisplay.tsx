@@ -1,4 +1,5 @@
 import React from 'react'
+import { FlipClock } from './FlipClock'
 
 interface CountdownDisplayProps {
     timeLeft: {
@@ -24,39 +25,13 @@ interface CountdownDisplayProps {
     primaryColor: string
 }
 
-function FlipCard({ value, label }: { value: string, label: string }) {
-    const [currentValue, setCurrentValue] = React.useState(value)
-    const [nextValue, setNextValue] = React.useState(value)
-    const [isAnimating, setIsAnimating] = React.useState(false)
+/**
+ * FlipCard - A single digit with split-flap animation
+ * 
+ * Timing: Bottom stays on OLD value until flap is halfway down,
+ * then switches to NEW value in sync with the reveal.
+ */
 
-    React.useEffect(() => {
-        if (value !== nextValue) {
-            setNextValue(value)
-            setIsAnimating(true)
-            const timer = setTimeout(() => {
-                setCurrentValue(value)
-                setIsAnimating(false)
-            }, 600) // Match CSS transition duration
-            return () => clearTimeout(timer)
-        }
-    }, [value, nextValue])
-
-    return (
-        <div className={`countdown-flip-unit ${isAnimating ? 'animating' : ''}`}>
-            <div className="flip-card">
-                {/* Static Backgrounds */}
-                <div className="top-next"><span>{nextValue}</span></div>
-                <div className="bottom-current"><span>{currentValue}</span></div>
-
-                {/* The Moving Leaf */}
-                <div className="leaf">
-                    <div className="leaf-front"><span>{currentValue}</span></div>
-                    <div className="leaf-back"><span>{nextValue}</span></div>
-                </div>
-            </div>
-        </div>
-    )
-}
 
 export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, primaryColor }: CountdownDisplayProps) {
 
@@ -161,16 +136,7 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
                     </div>
                 )}
 
-                {style === 'flip' && (
-                    <div className="countdown-flip-group">
-                        <div className="countdown-flip-digits">
-                            {pad(value).split('').map((digit, idx) => (
-                                <FlipCard key={idx} value={digit} label="" />
-                            ))}
-                        </div>
-                        <div className="countdown-label">{label}</div>
-                    </div>
-                )}
+
 
                 {(style === 'card' || style === 'digital') && (
                     <>
@@ -179,6 +145,22 @@ export function CountdownDisplay({ timeLeft, style, visibleUnits, unitLabels, pr
                         <div className="countdown-label">{label}</div>
                     </>
                 )}
+            </div>
+        )
+    }
+
+    if (style === 'flip') {
+        return (
+            <div className={`countdown-container style-${style}`}>
+                <FlipClock
+                    days={displayValues.days}
+                    hours={displayValues.hours}
+                    minutes={displayValues.minutes}
+                    seconds={displayValues.seconds}
+                    visibleUnits={visibleUnits}
+                    unitLabels={unitLabels}
+                    primaryColor={primaryColor}
+                />
             </div>
         )
     }

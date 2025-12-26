@@ -45,7 +45,8 @@
 
 /* Title */
 .render__title {
-  font-size: clamp(3rem, 5vw, 6rem);
+  /* Reduced max size from 6rem to 5rem to differentiate from strictly hero content */
+  font-size: clamp(2rem, 4vw, 5rem);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   text-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
@@ -126,40 +127,37 @@
 }
 
 /* --- Style: Flip (Card-like) --- */
-.style-flip .countdown-item {
-  background: rgba(0, 0, 0, 0.2);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(0.625rem);
-  border: 0.0625rem solid rgba(255, 255, 255, 0.1);
+.style-flip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  padding-bottom: 2vh;
 }
 
-.style-flip .countdown-value {
-  font-size: clamp(3rem, 8vw, 10rem);
-  font-weight: 800;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
-}
 
 /* --- Style: Circle (Progress) --- */
 .style-circle {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: clamp(1rem, 2vw, 3rem);
+  align-content: center;
+  /* Scale gaps dynamically: tighter on phones, looser on desktops */
+  gap: clamp(0.5rem, 2vh, 2rem);
   width: 100%;
+  height: 100%;
 }
 
 .style-circle .countdown-item {
   position: relative;
-  flex: 1 1 80%;
-  max-width: 90%;
+  /* Flex basis ensures 4 items wrap correctly in a 2x2 grid by default */
+  flex: 0 0 45%;
+  max-width: 45%;
   aspect-ratio: 1 / 1;
 
-  /* Safety Cap within Cell */
-  max-height: 80vh;
+  /* Critical: constrain height so 2 rows always fit in view */
+  max-height: 40vh;
 
   display: flex;
   flex-direction: column;
@@ -170,19 +168,91 @@
   container-type: inline-size;
 }
 
-/* Square / Standard Ratio: 2 Columns */
-@media (min-aspect-ratio: 4/5) {
+/* 
+   LAYOUT: TALL RECTANGLE (< 0.6 ratio)
+   Ref: layout.md says Rectangle is 0.33-3.0, but we need
+   to handle the "Tall" subset (e.g. 9:16) where 2x2 is too cramped.
+   We stack them if it's very narrow.
+*/
+@media (max-aspect-ratio: 3/5) {
+
+  /* < 0.6 */
+  .render__content {
+    justify-content: flex-start;
+    /* Prevent top clipping */
+    padding-top: 5vh;
+    /* Safe visual margin */
+    gap: 2vh;
+    /* Reduce gap */
+  }
+
+  .render__title {
+    font-size: min(3rem, 5vh);
+    /* Shrink title */
+  }
+
+  .render__cta {
+    font-size: min(1.5rem, 3vh);
+  }
+
+  .style-circle {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    /* Fixes left-alignment issue */
+    padding-top: 2vh;
+    /* Reduced from 5vh */
+    height: auto;
+    gap: 1vh;
+  }
+
   .style-circle .countdown-item {
-    flex: 1 1 40%;
-    max-width: 45%;
+    flex: 0 0 auto;
+    /* Reduced to 18vh to fit 4 items (72vh total) + text */
+    width: 18vh;
+    max-width: 70vw;
+    height: 18vh;
+    max-height: 18vh;
   }
 }
 
-/* Wide Ratio (> 1.6): 4 Columns */
-@media (min-aspect-ratio: 16/10) {
+/* 
+   LAYOUT: SQUARE / PORTRAIT (0.75 - 1.33) 
+   Includes 3:4 (0.75), 4:5 (0.8), 1:1, 4:3 (1.33)
+   Pattern: 2x2 Grid using the base styles above.
+   Refinement: ensure they don't overflow vertically.
+*/
+@media (min-aspect-ratio: 3/5) and (max-aspect-ratio: 4/3) {
+  .style-circle .countdown-item {
+    /* Ensure tight grid */
+    flex: 0 0 42%;
+    max-width: 45%;
+    max-height: 35vh;
+    /* Safety: 35% x 2 = 70%, leaves 30% for title/margin */
+  }
+
+  .style-circle .countdown-value {
+    /* Slightly reduce text relative to container size to prevent cutoff */
+    font-size: 25cqw;
+  }
+}
+
+/* 
+   LAYOUT: WIDE RECTANGLE (> 1.33)
+   Ref: layout.md "Rectangle" goes up to 3.0.
+   Pattern: Single Row (4 columns)
+*/
+@media (min-aspect-ratio: 4/3) {
+  .style-circle {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
   .style-circle .countdown-item {
     flex: 1 1 20%;
     max-width: 22%;
+    max-height: 60vh;
   }
 }
 
@@ -198,7 +268,8 @@
 
 .style-circle circle {
   fill: none;
-  stroke-width: 6;
+  stroke-width: 5;
+  /* Slightly thinner for cleaner look */
   stroke-linecap: round;
 }
 
@@ -213,7 +284,8 @@
 }
 
 .style-circle .countdown-value {
-  font-size: 30cqw;
+  /* Dynamic sizing based on container width */
+  font-size: 28cqw;
   font-weight: 700;
   z-index: 2;
   line-height: 1;
@@ -259,125 +331,8 @@
   text-transform: uppercase;
 }
 
-/* --- Style: Flip (Premium Mechanical) --- */
-.style-flip {
-  gap: var(--space-4);
-  perspective: 1000px;
-}
+/* WIDE (> 4:3): Single Row */
 
-.style-flip .countdown-flip-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.style-flip .countdown-flip-digits {
-  display: flex;
-  gap: 0.3rem;
-  /* Small gap between individual digits */
-}
-
-.style-flip .flip-card {
-  position: relative;
-  width: clamp(4rem, 10vw, 10rem);
-  --flip-h: clamp(7rem, 18vw, 15rem);
-  height: var(--flip-h);
-  color: #fff;
-  border-radius: 0.5rem;
-  font-size: clamp(4rem, 11vw, 11rem);
-  font-weight: 800;
-  line-height: var(--flip-h);
-}
-
-/* Card Segments (Base) */
-.style-flip .flip-card>div:not(.countdown-label) {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  background-color: #333;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.style-flip .top-next,
-.style-flip .leaf-front {
-  top: 0;
-  align-items: flex-start;
-  border-radius: 0.5rem 0.5rem 0 0;
-  background-image: linear-gradient(to bottom, #2c2c2c 0%, #3a3a3a 100%);
-  border-bottom: 0.0625rem solid rgba(0, 0, 0, 0.4);
-}
-
-.style-flip .bottom-current,
-.style-flip .leaf-back {
-  bottom: 0;
-  align-items: flex-start;
-  border-radius: 0 0 0.5rem 0.5rem;
-  background-image: linear-gradient(to bottom, #3a3a3a 0%, #2c2c2c 100%);
-}
-
-.style-flip .bottom-current span,
-.style-flip .leaf-back span {
-  transform: translateY(-50%);
-}
-
-
-/* The Animated Leaf (Hinge logic) */
-.style-flip .leaf {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  z-index: 3;
-  transform-origin: bottom;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.style-flip .leaf-front {
-  z-index: 2;
-}
-
-.style-flip .leaf-back {
-  z-index: 1;
-  transform: rotateX(-180deg);
-  height: 100% !important;
-  top: 0 !important;
-}
-
-/* Interaction: Animating State */
-.style-flip .animating .leaf {
-  transform: rotateX(-180deg);
-}
-
-/* Mechanical Hinge Overlay */
-.style-flip .flip-card::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 0.125rem;
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
-  z-index: 5;
-  transform: translateY(-50%);
-}
-
-.style-flip .countdown-label {
-  font-size: 1.25rem;
-  color: var(--color-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-weight: 700;
-  opacity: 0.9;
-}
 
 
 /* --- Style: Card (Boxed) --- */
@@ -523,8 +478,7 @@
   }
 
   .style-card .countdown-label,
-  .style-digital .countdown-label,
-  .style-flip .countdown-label {
+  .style-digital .countdown-label {
     font-size: 6vh !important;
     padding-top: 0.5vh !important;
     letter-spacing: 0.05em !important;
@@ -541,13 +495,7 @@
     line-height: 1 !important;
   }
 
-  .style-flip .flip-card {
-    --flip-h: 65vh;
-    height: var(--flip-h);
-    line-height: var(--flip-h);
-    font-size: 50vh;
-    width: 25vh;
-  }
+
 }
 
 @media (min-aspect-ratio: 6/1) {
@@ -642,5 +590,10 @@
 
   .render__content {
     gap: 1.5vw !important;
+  }
+
+  .style-flip .flip-clock {
+    /* Force fit */
+    font-size: 20vh !important;
   }
 }

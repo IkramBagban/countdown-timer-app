@@ -1,0 +1,365 @@
+/* Flip Clock Component Styles */
+:root {
+    --flip-duration: 0.6s;
+    --flip-perspective: 40rem;
+    /* Increased perspective for bigger elements */
+    /* Converted to rem */
+    --flip-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+
+    /* Theming Defaults (can be overridden) */
+    /* We use the theme variables provided by Render.tsx if available */
+    --flip-bg: var(--color-secondary, #222);
+    --flip-text: var(--color-primary, #ddd);
+
+    /* Sizing - using em/rem for responsiveness */
+    /* 
+       Base Sizing (Grid Layout 2x2):
+       Aggressively increased to 16vw.
+    */
+    --flip-font-size: clamp(4rem, 16vw, 25rem);
+
+    /* Dimensions relative to font size */
+    --flip-width: 1.8em;
+    /* Wider */
+    --flip-height: 1.4em;
+    /* Taller */
+    /* Taller aspect ratio */
+
+    --flip-radius: 0.15em;
+    /* Slightly rounder */
+}
+
+.flip-clock {
+    display: flex;
+    flex-wrap: wrap;
+    /* Enable wrapping for grid layouts */
+    justify-content: center;
+    gap: 0.1.3em;
+    /* Reduced gap */
+    font-family: 'Courier New', Courier, monospace;
+    font-size: var(--flip-font-size);
+    /* This drives the size of everything */
+    width: 100%;
+    /* Ensure it takes full container width */
+
+    /* Ensure local override works if props were passed (though we prefer vars now) */
+    --flip-bg: var(--color-secondary, #222);
+    --flip-text: var(--color-primary, #ddd);
+}
+
+/* Individual Unit Wrapper (e.g. Days, Hours) */
+.flip-unit-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1em;
+    /* Gap between card and label */
+
+    /* Default: Mobile / Portrait (2x2 Grid) behavior */
+    /* Try to fit 2 items per row ensuring they don't get too small */
+    flex: 1 1 40%;
+    max-width: 45%;
+}
+
+/* 
+   LAYOUT: Wide Rectangle (> 1.6 ratio) e.g. Landscape
+   Switch to Single Row (4 columns)
+*/
+@media (min-aspect-ratio: 16/10) {
+    .flip-clock {
+        flex-wrap: nowrap;
+        /* Force single row */
+        gap: 0.25em;
+        /* Tight gap */
+
+        /* 
+           Optimization for Width:
+           Targeting maximum width fill.
+           12vw per item * 4 + gaps
+        */
+        --flip-font-size: clamp(4rem, 12vw, 25rem);
+    }
+
+    .flip-unit-container {
+        flex: 1 1 0%;
+        max-width: none;
+    }
+}
+
+/* 
+   LAYOUT: Vertical / Tall (< 0.8 ratio) e.g. Portrait Phone
+   Stack them vertically (1 column)
+*/
+@media (max-aspect-ratio: 4/5) {
+    .flip-clock {
+        /* 
+            Optimizing for Height on tall screens.
+            Pushing the limits of vertical space.
+        */
+        --flip-font-size: clamp(4rem, 14vh, 20rem);
+    }
+
+    .flip-unit-container {
+        flex: 1 1 100%;
+        max-width: 90%;
+    }
+}
+
+/* 
+   LAYOUT: Ultra-Wide / Ribbon (> 8/1)
+   Switch back to Height constraint because Width is too abundant
+*/
+@media (min-aspect-ratio: 8/1) {
+    .flip-clock {
+        /* 
+           Height is the limiting factor here.
+           We want to fill height minus margins.
+           Target height = ~80vh?
+           1.1em = 80vh -> 1em = 72vh.
+        */
+        --flip-font-size: clamp(3rem, 70vh, 20rem);
+    }
+}
+
+.flip-label {
+    font-size: 0.2em;
+    /* Relative to the huge flip font size. 0.2 of 10rem is 2rem. */
+    color: var(--color-text-muted);
+    /* or match secondary? Guidelines say muted for labels. */
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+    margin-top: 0.1em;
+}
+
+/* The 3D Stage */
+.flip-container {
+    position: relative;
+    width: var(--flip-width);
+    height: var(--flip-height);
+    perspective: var(--flip-perspective);
+    perspective-origin: 50% 50%;
+
+    /* Reset */
+    box-sizing: border-box;
+    /* Font size inherited from .flip-clock */
+    font-weight: bold;
+    line-height: var(--flip-height);
+    /* Vertical centering hack */
+    border-radius: var(--flip-radius);
+    color: var(--flip-text);
+    box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.3);
+}
+
+/* Common Card Styles */
+.flip-card-part {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    background-color: var(--flip-bg);
+    box-sizing: border-box;
+
+    /* We use before for the number to ensure alignment */
+    display: flex;
+    justify-content: center;
+
+    /* Text alignment mechanics */
+    line-height: 0;
+    /* Let flexbox handle it or use specific height rules */
+}
+
+/* Top Half */
+.static-top,
+.flap-front {
+    top: 0;
+    border-radius: var(--flip-radius) var(--flip-radius) 0 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transform-origin: 50% 100%;
+    /* Bottom edge */
+    z-index: 1;
+    /* Default z-index */
+}
+
+/* Bottom Half */
+.static-bottom {
+    bottom: 0;
+    border-radius: 0 0 var(--flip-radius) var(--flip-radius);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    /* Hinge visual */
+    transform-origin: 50% 0%;
+    /* Top edge */
+    z-index: 1;
+}
+
+.flap-back {
+    bottom: 0;
+    border-radius: 0 0 var(--flip-radius) var(--flip-radius);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    transform-origin: 50% 50%;
+    /* Center rotation to align 'cut' to hinge */
+    z-index: 1;
+}
+
+/* Text Positioning inside halves 
+   We want the text to look like one continuous number.
+   For top half: show top half of text.
+   For bottom half: show bottom half of text.
+*/
+.flip-card-part span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--flip-height);
+    line-height: var(--flip-height);
+    text-align: center;
+    display: block;
+}
+
+.static-top span,
+.flap-front span {
+    top: 0;
+}
+
+.static-bottom span,
+.flap-back span {
+    bottom: 0;
+}
+
+/* The Flap Wrapper - The Moving Part */
+.flap-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    /* Only matches top half dimension initially */
+    z-index: 20;
+    /* Above static layers */
+    transform-style: preserve-3d;
+    transform-origin: 50% 100%;
+    /* Hinge is at the bottom of the top half */
+}
+
+/* Faces of the Flap */
+.flap-front,
+.flap-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* Important: backface visibility */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Reset z-index for faces inside wrapper is tricky, 
+     but transform-style preserve-3d handles it mostly. 
+  */
+    top: 0;
+    left: 0;
+}
+
+.flap-front {
+    z-index: 2;
+    transform: rotateX(0deg);
+}
+
+.flap-back {
+    z-index: 1;
+    transform: rotateX(-180deg);
+}
+
+/* Hinge Line - purely visual, sits on top */
+.flip-hinge {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.2);
+    transform: translateY(-50%);
+    z-index: 30;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Highlight for 3D feel */
+}
+
+
+/* Hinge Line - purely visual */
+/* Removed in favor of static .flip-hinge and borders */
+
+/* Lighting / Shadows */
+/* Front Face Shadow: 0 -> 1 as it goes down */
+.flap-front::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: black;
+    opacity: 0;
+    z-index: 3;
+    transition: opacity var(--flip-duration) var(--flip-ease);
+}
+
+/* Back Face Highlight: 1 -> 0 as it flips up */
+.flap-back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: black;
+    opacity: 1;
+    /* Starts dark (hidden) */
+    z-index: 3;
+    transition: opacity var(--flip-duration) var(--flip-ease);
+}
+
+
+/* Animation State: .flipping */
+
+/* When flipping, rotate the entire wrapper */
+.flipping .flap-wrapper {
+    animation: flip-down var(--flip-duration) var(--flip-ease) forwards;
+}
+
+.flipping .flap-front::before {
+    animation: shadow-in var(--flip-duration) var(--flip-ease) forwards;
+}
+
+.flipping .flap-back::before {
+    animation: shadow-out var(--flip-duration) var(--flip-ease) forwards;
+}
+
+
+@keyframes flip-down {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    100% {
+        transform: rotateX(-180deg);
+    }
+}
+
+@keyframes shadow-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes shadow-out {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
