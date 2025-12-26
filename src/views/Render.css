@@ -869,83 +869,135 @@
 /* End Extreme Vertical */
 
 /* Very Extreme (6:1) - just refinements */
+/* Very Extreme (6:1 to 9:1+) - Ribbon / Banner Layout */
 @media (min-aspect-ratio: 6/1) {
   .render__content {
-    flex-direction: row !important;
-    justify-content: space-evenly !important;
-    gap: 2vw !important;
-    padding: 0 3vw !important;
+    /* Use Grid for precise corner placement */
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "title cta"
+      "timer timer";
+    padding: 2vh 3vw !important;
+    gap: 1vh !important;
+    align-content: center;
+    justify-content: center;
   }
 
   .render__title {
-    font-size: 12vh !important;
+    grid-area: title;
+    justify-self: start;
+    align-self: start;
     text-align: left !important;
-    flex: 1 !important;
-    max-width: 20vw !important;
     margin: 0 !important;
+    width: auto !important;
+    max-width: 45vw !important;
+    font-size: calc(8vh * var(--ui-scale, 1)) !important;
+    /* Scalable title */
   }
 
   .render__cta {
-    font-size: 8vh !important;
+    grid-area: cta;
+    justify-self: end;
+    align-self: start;
     text-align: right !important;
-    margin-top: 0 !important;
-    flex: 1 !important;
-    max-width: 20vw !important;
     margin: 0 !important;
+    width: auto !important;
+    max-width: 45vw !important;
+    font-size: calc(6vh * var(--ui-scale, 1)) !important;
+    /* Scalable CTA */
   }
 
   .countdown-container {
-    flex: 5 !important;
-    flex-wrap: nowrap !important;
-    gap: 1.5vw !important;
-    justify-content: center !important;
-    height: 100% !important;
+    grid-area: timer;
+    justify-self: center;
+    align-self: center;
+    width: 95vw !important;
+    max-width: 98vw !important;
+    margin-top: 1vh;
   }
 
-  .countdown-item,
-  .countdown-flip-container {
-    height: 85vh !important;
-    justify-content: center !important;
-    flex: 0 1 auto !important;
+  /* Style Tweaks for this Squashed Layout */
+
+  /* 1. CIRCLE FIX */
+  /* 1. CIRCLE FIX */
+  .style-circle {
+    gap: 5vw !important;
+    height: calc(82vh * var(--ui-scale, 1)) !important;
+    /* Bigger circle radius */
+    max-height: 90vh !important;
   }
 
-  /* Universal value scaling for Ribbons */
-  .countdown-value {
-    font-size: 30vh !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-    height: 65vh !important;
+  .style-circle .countdown-item {
+    flex-direction: column !important;
+    /* Stack vertically to fit in circle */
+    align-items: center;
+    justify-content: center;
+    gap: 0;
     width: auto !important;
-    min-width: 8vw !important;
-    padding: 0 1vw !important;
-    display: flex !important;
-    align-items: center !important;
   }
 
-  .style-flip .flip-card {
-    --flip-h: 65vh;
-    height: var(--flip-h) !important;
-    line-height: var(--flip-h) !important;
-    font-size: 45vh !important;
-    width: 22vh !important;
-    display: flex !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
+  .style-circle .countdown-value {
+    font-size: calc(38vh * var(--ui-scale, 1)) !important;
+    /* Smaller text */
+    line-height: 1.1;
+    margin: 0;
+    padding: 0;
   }
 
-  .countdown-label {
-    font-size: 4.5vh !important;
+  .style-circle .countdown-label {
+    font-size: calc(6vh * var(--ui-scale, 1)) !important;
+    /* Scalable Label */
     padding-top: 0 !important;
-    margin: 0 !important;
-    letter-spacing: 0.02em !important;
+    text-align: center;
+    width: 100%;
   }
 
-  /* Specific Circle fix for Ribbon */
-  .style-circle .countdown-circle-container {
-    height: 90vh !important;
-    width: 20vh !important;
+  /* 2. DIGITAL FIX */
+  .style-digital {
+    gap: 3vw !important;
+  }
+
+  .style-digital .countdown-value {
+    font-size: calc(55vh * var(--ui-scale, 1)) !important;
+    /* Scalable LED */
+    /* Huge */
+  }
+
+  /* 3. FLIP CLOCK FIX */
+  .style-flip .flip-clock {
+    --flip-font-size: calc(50vh * var(--ui-scale, 1)) !important;
+    /* Scalable Flip */
+    /* Bigger font */
+    gap: 4vw !important;
+    /* Increased space between flippers */
+  }
+
+  .style-flip .flip-container {
+    width: 2.0em !important;
+    /* Wider flipper */
+  }
+
+  /* 4. CARD FIX */
+  .style-card .countdown-item {
+    height: calc(60vh * var(--ui-scale, 1)) !important;
+    /* Scalable Card */
+  }
+
+  .style-card .countdown-value {
+    font-size: calc(40vh * var(--ui-scale, 1)) !important;
+  }
+
+  .style-card .countdown-label {
+    width: 100% !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    /* Ensure it stays wide */
+    font-size: calc(5vh * var(--ui-scale, 1)) !important;
   }
 }
+
 
 /* Extreme Ribbons (e.g. 55:6 or > 9:1) */
 @media (min-aspect-ratio: 9/1) {
@@ -966,5 +1018,90 @@
   .style-flip .flip-clock {
     /* Force fit */
     font-size: 20vh !important;
+  }
+}
+
+/* Extreme Ribbons (e.g. 55:6 or > 9:1) - APPENDED OVERRIDE */
+@media (min-aspect-ratio: 9/1) {
+  .render__content {
+    display: flex !important;
+    position: relative !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  /* ABSOLUTE POSITIONING for Title & CTA */
+  .render__title {
+    position: absolute !important;
+    top: 2vh;
+    /* Moved up */
+    left: 2vw;
+    text-align: left !important;
+    width: auto !important;
+    margin: 0 !important;
+    font-size: calc(8vh * var(--ui-scale, 1)) !important;
+    z-index: 10;
+  }
+
+  .render__cta {
+    position: absolute !important;
+    top: 2vh;
+    /* Moved up */
+    right: 2vw;
+    text-align: right !important;
+    width: auto !important;
+    margin: 0 !important;
+    font-size: calc(6vh * var(--ui-scale, 1)) !important;
+    z-index: 10;
+  }
+
+  .countdown-container {
+    width: 90vw !important;
+    height: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding-top: 12vh !important;
+    /* Margin for Title overlap */
+  }
+
+  /* Sizing Overrides for 9:1 */
+
+  /* 1. FLIP CLOCK */
+  .style-flip .flip-clock {
+    --flip-font-size: calc(75vh * var(--ui-scale, 1)) !important;
+    /* HUGE */
+    gap: 4vw !important;
+  }
+
+  .style-flip .flip-container {
+    width: 2.2em !important;
+  }
+
+  /* 2. CIRCLE */
+  .style-circle {
+    height: calc(85vh * var(--ui-scale, 1)) !important;
+    gap: 6vw !important;
+  }
+
+  .style-circle .countdown-value {
+    font-size: calc(40vh * var(--ui-scale, 1)) !important;
+  }
+
+  /* 3. CARD */
+  .style-card .countdown-label {
+    font-size: calc(7vh * var(--ui-scale, 1)) !important;
+  }
+
+  .style-card .countdown-item {
+    height: calc(65vh * var(--ui-scale, 1)) !important;
+  }
+
+  /* 4. DIGITAL */
+  .style-digital .countdown-value {
+    font-size: calc(65vh * var(--ui-scale, 1)) !important;
   }
 }

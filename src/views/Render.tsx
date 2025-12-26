@@ -95,6 +95,7 @@ export function Render() {
     '--color-secondary': themeSecondary || '#F8B334',
     '--bg-color': background?.type === 'solid' ? background.color : '#111',
     '--bg-opacity': (background?.opacity || 100) / 100,
+    '--ui-scale': uiScale || 1, // Expose scale for vh/vw calc
   } as CSSProperties
 
   // Media Fetching Logic
