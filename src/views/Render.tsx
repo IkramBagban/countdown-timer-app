@@ -1,5 +1,6 @@
 import { store, media } from '@telemetryos/sdk'
 import { useUiScaleToSetRem } from '@telemetryos/sdk/react'
+import ReactMarkdown from 'react-markdown'
 import { useEffect } from 'react'
 import {
   useTargetDateStoreState,
@@ -170,7 +171,11 @@ export function Render() {
             {renderBackground()}
             <div className="render__content">
               {/* Header: Title (Hide on completion) */}
-              {!isCompleted && title && <h1 className="render__title">{title}</h1>}
+              {!isCompleted && title && (
+                <div className="render__title">
+                  <ReactMarkdown>{title}</ReactMarkdown>
+                </div>
+              )}
 
               {/* Main: Timer or Completion */}
               {!isCompleted ? (
@@ -186,7 +191,11 @@ export function Render() {
                   {!hasExpired ? (
                     <>
                       {completionType === 'text' ? (
-                        completionText && <div className="render__completion">{completionText}</div>
+                        completionText && (
+                          <div className="render__completion">
+                            <ReactMarkdown>{completionText}</ReactMarkdown>
+                          </div>
+                        )
                       ) : (
                         completionUrl && (
                           <div className="render__completion-media">
@@ -208,7 +217,11 @@ export function Render() {
               )}
 
               {/* Footer: CTA (Hide on completion) */}
-              {!isCompleted && cta && <div className="render__cta">{cta}</div>}
+              {!isCompleted && cta && (
+                <div className="render__cta">
+                  <ReactMarkdown>{cta}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </>
         )}

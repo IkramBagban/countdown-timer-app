@@ -14,6 +14,7 @@ import {
   SettingsBox,
   SettingsDivider,
 } from '@telemetryos/sdk/react'
+import { MarkdownEditor } from '../components/MarkdownEditor'
 import { useEffect, useState } from 'react'
 import {
   useTargetDateStoreState,
@@ -201,26 +202,23 @@ export function Settings() {
 
         <SettingsField>
           <SettingsLabel>Event Title</SettingsLabel>
-          <SettingsInputFrame>
-            <input
-              type="text"
-              placeholder="e.g. Grand Opening"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </SettingsInputFrame>
+          <MarkdownEditor
+            value={title}
+            onChange={setTitle}
+            placeholder="e.g. Grand Opening"
+            multiline={false}
+          />
         </SettingsField>
 
         <SettingsField>
           <SettingsLabel>Call to Action</SettingsLabel>
-          <SettingsTextAreaFrame>
-            <textarea
-              placeholder="e.g. Join us for the celebration!"
-              value={cta}
-              onChange={(e) => setCta(e.target.value)}
-              rows={2}
-            />
-          </SettingsTextAreaFrame>
+          <MarkdownEditor
+            value={cta}
+            onChange={setCta}
+            placeholder="e.g. Join us for the celebration!"
+            multiline={true}
+            rows={2}
+          />
         </SettingsField>
 
         <SettingsDivider />
@@ -252,13 +250,12 @@ export function Settings() {
         {completionType === 'text' ? (
           <SettingsField>
             <SettingsLabel>Completion Message</SettingsLabel>
-            <SettingsTextAreaFrame>
-              <textarea
-                value={completionText}
-                onChange={(e) => setCompletionText(e.target.value)}
-                rows={3}
-              />
-            </SettingsTextAreaFrame>
+            <MarkdownEditor
+              value={completionText}
+              onChange={setCompletionText}
+              multiline={true}
+              rows={3}
+            />
           </SettingsField>
         ) : (
           <SettingsField>

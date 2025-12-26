@@ -62,6 +62,30 @@
 }
 
 
+/* Markdown Overrides */
+.render__title p,
+.render__cta p,
+.render__completion p {
+  margin: 0;
+  line-height: inherit;
+}
+
+.render__title strong,
+.render__cta strong,
+.render__completion strong {
+  font-weight: 900;
+  color: var(--color-secondary);
+  /* Highlight bold text with secondary color */
+}
+
+.render__title em,
+.render__cta em,
+.render__completion em {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+
 
 /* Completion Message */
 .render__completion {
