@@ -161,6 +161,7 @@
 }
 
 
+
 /* --- Style: Circle (Progress) --- */
 .style-circle {
   display: flex;
@@ -239,7 +240,139 @@
     height: 18vh;
     max-height: 18vh;
   }
+
+  /* LED Style Vertical Fix */
+  .style-digital {
+    flex-direction: column;
+    gap: 2vh !important;
+    width: 100%;
+    align-items: center;
+  }
+
+  .style-digital .countdown-item {
+    width: 90vw;
+    /* Use full width */
+    flex: 1 1 auto;
+    padding: 1rem;
+    min-width: 0;
+  }
+
+  .style-digital .countdown-value {
+    font-size: 10vh !important;
+    /* Huge for visibility */
+    line-height: 1.1;
+  }
+
+  .style-digital .countdown-label {
+    font-size: 2.5vh !important;
+    margin-top: 0;
+  }
+
+  /* Card Style Vertical Fix */
+  .style-card {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    /* Fix left alignment */
+    gap: 1.5vh !important;
+    /* Tight gaps */
+  }
+
+  .style-card .countdown-item {
+    width: 90vw;
+    /* Fill width */
+    height: 18vh;
+    /* Fixed height per item (4x18 = 72vh) */
+    flex: 0 0 auto;
+    /* Don't shrink */
+    max-width: none;
+    padding: 0;
+  }
+
+  .style-card .countdown-value {
+    /* Request was "2x scaler", so huge font */
+    font-size: 8vh !important;
+    margin-bottom: 0;
+  }
+
+  .style-card .countdown-label {
+    font-size: 2vh !important;
+  }
 }
+
+/* Portrait Flip Clock Fix (0.33 - 0.8) - PLACED AFTER 3/5 TO WIN SPECIFICITY */
+/* Portrait Flip Clock Fix (0.33 - 0.8) - PLACED AFTER 3/5 TO WIN SPECIFICITY */
+@media (max-aspect-ratio: 4/5) {
+  .render__content {
+    /* Override padding to be safer */
+    padding-top: 5vh;
+    gap: 1.5vh;
+  }
+
+  /* Override the component's internal variables at the root level of the style wrapper */
+  .style-flip .flip-clock {
+    flex-direction: column;
+    gap: 1.5vh;
+    padding: 0 5vw;
+    /* 5% Safe Zone */
+
+    /* 
+       Dynamic Width: 
+       Allows scaling beyond viewport if UI scale is high (preserving readability).
+       Default: 90vw (fits screen).
+    */
+    width: max(90vw, 25rem);
+    max-width: none;
+    /* remove constraint to allow scaler to overflow if needed */
+
+    /* 
+       Dynamic Height/Size:
+       Increased to 9.5vh for taller cards.
+       4rem floor ensures 2x/3x UI scale triggers growth.
+    */
+    --flip-font-size: max(9.5vh, 4rem) !important;
+  }
+
+  /* Ensure the unit container takes full width of the padded area */
+  .style-flip .flip-unit-container {
+    width: 100%;
+    max-width: 100%;
+    flex: 1 1 auto;
+  }
+
+  /* Target the actual 3D container if we need specific overrides, 
+     but changing font-size should handle the dimensions (width/height) automatically 
+     since FlipClock.css uses ems. 
+     We just ensure width constraint.
+  */
+  .style-flip .flip-container {
+    /* Widen the cards relative to their font size if needed, 
+         but preserving aspect ratio is usually better. 
+         FlipClock.css: width: 1.8em. 
+         8vh * 1.8 = 14.4vh width. 
+         If user wants WIDE cards, we might need to break aspect ratio or increase font size but reduce height?
+         Let's trust the font-size scaling first, as stretching 3D cards might look weird.
+         However, user asked for "increase width".
+         To increase width without increasing height, we modify --flip-width.
+      */
+    --flip-width: 55vw;
+    --flip-height: 15vh;
+
+    /* Force extremely wide cards */
+    width: var(--flip-width);
+    /* Override em-based width */
+    font-size: 10vh;
+    /* Ensure context */
+  }
+
+  /* Adjust label */
+  .style-flip .flip-label {
+    font-size: 1.8vh;
+    margin-top: 0.5vh;
+    letter-spacing: 0.1em;
+  }
+}
+
 
 /* 
    LAYOUT: SQUARE / PORTRAIT (0.75 - 1.33) 
@@ -247,18 +380,80 @@
    Pattern: 2x2 Grid using the base styles above.
    Refinement: ensure they don't overflow vertically.
 */
-@media (min-aspect-ratio: 3/5) and (max-aspect-ratio: 4/3) {
+/* 
+   =========================================
+   LAYOUT STANDARDIZATION & CONSISTENCY 
+   =========================================
+   Ratio < 1.6: 2x2 Grid (Title Top, Content Mid, CTA Bottom)
+   Ratio > 1.6: 4x1 Single Row (Title Top, Content Mid, CTA Bottom)
+*/
+
+/* 1. SQUARE / PORTRAIT / STANDARD (0.6 - 1.6) -> 2x2 GRID */
+/* 1. SQUARE / PORTRAIT / STANDARD (0.6 - 1.6) -> 2x2 GRID */
+@media (min-aspect-ratio: 3/5) and (max-aspect-ratio: 16/10) {
+
+  /* Common Grid Logic for ALL styles */
+  .style-card .countdown-item,
+  .style-digital .countdown-item,
   .style-circle .countdown-item {
-    /* Ensure tight grid */
-    flex: 0 0 42%;
-    max-width: 45%;
+    flex: 0 0 45% !important;
+    max-width: 45% !important;
+    margin-bottom: 2vh;
+    /* Spacing between rows */
+  }
+
+  /* Specific Adjustments */
+  .style-card .countdown-item {
     max-height: 35vh;
-    /* Safety: 35% x 2 = 70%, leaves 30% for title/margin */
+  }
+
+  /* CIRCLE STYLE REFINEMENTS */
+  .style-circle .countdown-item {
+    /* Reduced max-height to 30vh (from 35vh) to prevent crowding */
+    max-height: 35vh;
+    aspect-ratio: 1/1;
+    /* Center content */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .style-circle .countdown-label {
+    /* Added top spacing as requested ("space under circle") */
+    padding-top: 1.5rem !important;
+    font-size: 1rem !important;
   }
 
   .style-circle .countdown-value {
     /* Slightly reduce text relative to container size to prevent cutoff */
-    font-size: 25cqw;
+    font-size: 20cqw;
+  }
+
+  .style-digital .countdown-item {
+    /* Ensure LED boxes look good in grid */
+    min-width: 0 !important;
+  }
+
+  /* LED Scaling Fix for Square/Grid */
+  .style-digital .countdown-value {
+    font-size: max(8rem, 15vw) !important;
+  }
+
+  .style-digital .countdown-label {
+    font-size: 2rem !important;
+  }
+
+  /* FLIP CLOCK FIXES (Prevent Vertical Cutoff) */
+  .style-flip .flip-clock {
+    justify-content: center;
+    gap: 1.5vh;
+    font-size: 15cqw;
+    /* Reduced gap to save vertical space */
+    padding-bottom: 0;
+    /* Remove excess padding */
+    /* Constrain size in grid mode to avoid vertical overflow */
+    --flip-font-size: clamp(3rem, 12vw, 15vh) !important;
   }
 }
 
@@ -267,15 +462,33 @@
    Ref: layout.md "Rectangle" goes up to 3.0.
    Pattern: Single Row (4 columns)
 */
-@media (min-aspect-ratio: 4/3) {
-  .style-circle {
-    flex-wrap: nowrap;
-    align-items: center;
+/* 2. WIDE RECTANGLE (> 1.6) -> 4x1 ROW */
+@media (min-aspect-ratio: 16/10) {
+
+  /* Force Single Row for ALL styles */
+  .style-card,
+  .style-digital,
+  .style-circle,
+  .style-flip .flip-clock {
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2vw !important;
   }
 
+  .style-card .countdown-item,
+  .style-digital .countdown-item,
   .style-circle .countdown-item {
-    flex: 1 1 20%;
-    max-width: 22%;
+    flex: 1 1 20% !important;
+    max-width: 22% !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Circle Fix for Wide */
+  .style-circle .countdown-item {
+    aspect-ratio: 1/1;
+    height: auto;
     max-height: 60vh;
   }
 }
@@ -328,15 +541,15 @@
 
 /* --- Style: Digital (LED) --- */
 .style-digital {
-  gap: var(--space-4);
+  gap: 1rem;
   font-family: 'Courier New', Courier, monospace;
-  /* Segment font fallback */
 }
 
 .style-digital .countdown-item {
   color: var(--color-secondary);
   text-shadow: 0 0 1rem var(--color-secondary);
   background: rgba(0, 0, 0, 0.3);
+
   padding: 1.5rem 2rem;
   border-radius: 0.5rem;
   border: 0.0625rem solid rgba(255, 255, 255, 0.1);
@@ -347,6 +560,7 @@
   font-size: clamp(4rem, 10vw, 10rem);
   font-weight: 700;
   letter-spacing: 0.05em;
+
 }
 
 .style-digital .countdown-label {
@@ -466,62 +680,195 @@
    ========================================= */
 
 /* Wide Ratio (3:1) */
+/* Wide Ratio (3:1) - Updated to Row Layout as requested */
+/* Wide Ratio (3:1) - Adjusted to Vertical Stack + Horizontal Row Timer as requested */
 @media (min-aspect-ratio: 3/1) {
   .render__content {
-    gap: 3vh !important;
-    padding: 2vh 5vw !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 4vh !important;
+    padding: 4vh 5vw !important;
   }
 
   .render__title {
-    font-size: 10vh !important;
-    max-width: 25vw !important;
-    line-height: 1.1 !important;
+    font-size: 8vh !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 80vw !important;
+    margin: 0 !important;
+    order: 0 !important;
   }
 
   .render__cta {
-    font-size: 6vh !important;
-    margin-top: 0 !important;
-    max-width: 25vw !important;
+    font-size: 5vh !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 80vw !important;
+    margin: 0 !important;
+    order: 2 !important;
   }
 
-  .style-card {
-    gap: 3vh !important;
+  .countdown-container {
+    flex: 1 !important;
+    width: 100% !important;
+    max-width: 95vw !important;
+    justify-content: center !important;
+    align-items: center !important;
+    order: 1 !important;
   }
 
-  .style-card .countdown-item {
-    max-height: 80vh !important;
-    padding: 1vh 2vh !important;
-    border-radius: 0.5rem !important;
-    flex: 0 1 auto !important;
-    min-width: 10vw !important;
+  /* 
+     ISOLATED LAYOUT RULES PER STYLE 
+     Ensures tweaking one doesn't break the others.
+  */
+
+  /* 1. FLIP CLOCK */
+  .style-flip .flip-clock {
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    gap: 2vw !important;
+    width: auto !important;
   }
 
-  .style-card .countdown-value {
-    font-size: 35vh !important;
-    margin-bottom: 0 !important;
+  .style-flip .flip-unit-container {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
   }
 
-  .style-card .countdown-label,
-  .style-digital .countdown-label {
-    font-size: 6vh !important;
-    padding-top: 0.5vh !important;
-    letter-spacing: 0.05em !important;
+  /* 2. DIGITAL / LED */
+  .style-digital {
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    gap: 2vw !important;
+    width: auto !important;
   }
 
   .style-digital .countdown-item {
-    padding: 1vh 2vh !important;
-    height: 60vh !important;
-    min-width: 15vw !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  /* 3. CARD */
+  .style-card {
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    gap: 2vw !important;
+    width: auto !important;
+  }
+
+  .style-card .countdown-item {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  /* 4. CIRCLE - Fix Visibility Issue */
+  .style-circle {
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    gap: 2vw !important;
+    width: auto !important;
+    height: 50vh !important;
+    /* Explicit height to prevent collapse */
+    align-items: center !important;
+  }
+
+  .style-circle .countdown-item {
+    flex: 0 1 auto !important;
+    /* Don't stretch infinitely */
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    /* Fill container */
+    max-height: none !important;
+    aspect-ratio: 1/1 !important;
+    /* Force square */
+  }
+
+  /* Specific Sizing for Row Layout */
+
+  /* Flip Clock - Significant font boost */
+  .style-flip .flip-clock {
+    --flip-font-size: 35vh !important;
+  }
+
+  .style-flip .flip-container {
+    width: 1.6em !important;
+    font-size: inherit !important;
+  }
+
+  /* Digital / LED - Significant font boost */
+  .style-digital .countdown-item {
+    padding: 3vh 4vw !important;
   }
 
   .style-digital .countdown-value {
-    font-size: 40vh !important;
-    line-height: 1 !important;
+    font-size: 38vh !important;
   }
 
+  .style-digital .countdown-label {
+    font-size: 5vh !important;
+  }
 
+  /* Card - Significant boost */
+  .style-card .countdown-item {
+    height: 55vh !important;
+  }
+
+  .style-card .countdown-value {
+    font-size: 28vh !important;
+  }
+
+  .style-card .countdown-label {
+    font-size: 4vh !important;
+  }
 }
 
+/* Extreme Vertical (Skyscraper / Sidebar) < 1:4 */
+@media (max-aspect-ratio: 1/4) {
+  .render__content {
+    gap: 1vh !important;
+    padding-top: 2vh !important;
+  }
+
+  .render__title {
+    font-size: min(1.8rem, 3vh) !important;
+    /* Smaller title */
+    line-height: 1.1;
+  }
+
+  .render__cta {
+    font-size: min(1.2rem, 2vh) !important;
+  }
+
+  .style-flip .flip-clock {
+    padding: 0 2vw;
+    gap: 3vh;
+    /* Reduce font size to make numbers smaller/less dominant */
+    --flip-font-size: max(6vh, 2.5rem) !important;
+  }
+
+  .style-flip .flip-container {
+    /* Increase card width to almost full screen width */
+    width: 80vw !important;
+    --flip-width: 95vw !important;
+  }
+
+  .style-flip .flip-label {
+    font-size: 1.5vh;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* End Extreme Vertical */
+
+/* Very Extreme (6:1) - just refinements */
 @media (min-aspect-ratio: 6/1) {
   .render__content {
     flex-direction: row !important;
